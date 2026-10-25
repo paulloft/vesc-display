@@ -1,0 +1,202 @@
+{
+  "left": {
+    "size": [
+      36,
+      28
+    ],
+    "visible_bounds": [
+      3,
+      4,
+      33,
+      23
+    ],
+    "center": [
+      17.5,
+      13.0
+    ],
+    "cell_center": [
+      17.5,
+      13.5
+    ]
+  },
+  "right": {
+    "size": [
+      36,
+      28
+    ],
+    "visible_bounds": [
+      3,
+      4,
+      33,
+      23
+    ],
+    "center": [
+      17.5,
+      13.0
+    ],
+    "cell_center": [
+      17.5,
+      13.5
+    ]
+  },
+  "position": {
+    "size": [
+      36,
+      28
+    ],
+    "visible_bounds": [
+      3,
+      7,
+      33,
+      21
+    ],
+    "center": [
+      17.5,
+      13.5
+    ],
+    "cell_center": [
+      17.5,
+      13.5
+    ]
+  },
+  "low_beam": {
+    "size": [
+      36,
+      28
+    ],
+    "visible_bounds": [
+      3,
+      4,
+      33,
+      23
+    ],
+    "center": [
+      17.5,
+      13.0
+    ],
+    "cell_center": [
+      17.5,
+      13.5
+    ]
+  },
+  "high_beam": {
+    "size": [
+      36,
+      28
+    ],
+    "visible_bounds": [
+      3,
+      5,
+      33,
+      23
+    ],
+    "center": [
+      17.5,
+      13.5
+    ],
+    "cell_center": [
+      17.5,
+      13.5
+    ]
+  },
+  "hazard": {
+    "size": [
+      64,
+      56
+    ],
+    "visible_bounds": [
+      8,
+      7,
+      56,
+      49
+    ],
+    "center": [
+      31.5,
+      27.5
+    ],
+    "cell_center": [
+      31.5,
+      27.5
+    ]
+  },
+  "warning": {
+    "size": [
+      36,
+      28
+    ],
+    "visible_bounds": [
+      7,
+      4,
+      29,
+      23
+    ],
+    "center": [
+      17.5,
+      13.0
+    ],
+    "cell_center": [
+      17.5,
+      13.5
+    ]
+  },
+  "battery": {
+    "size": [
+      28,
+      48
+    ],
+    "visible_bounds": [
+      3,
+      2,
+      25,
+      46
+    ],
+    "center": [
+      13.5,
+      23.5
+    ],
+    "cell_center": [
+      13.5,
+      23.5
+    ]
+  },
+  "thermometer": {
+    "size": [
+      24,
+      42
+    ],
+    "visible_bounds": [
+      3,
+      3,
+      20,
+      39
+    ],
+    "center": [
+      11.0,
+      20.5
+    ],
+    "cell_center": [
+      11.5,
+      20.5
+    ]
+  },
+  "brake": {
+    "size": [
+      36,
+      28
+    ],
+    "visible_bounds": [
+      3,
+      3,
+      33,
+      24
+    ],
+    "center": [
+      17.5,
+      13.0
+    ],
+    "cell_center": [
+      17.5,
+      13.5
+    ]
+  }
+}

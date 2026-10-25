@@ -1,0 +1,85 @@
+# PlatformIO and local build output
+/.pio/
+/build/
+/dist/*.bin
+/dist/manifest.json
+
+# Python environments and caches
+/.venv/
+/venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Local editor configuration
+/.vscode/
+/.idea/
+*.iml
+*.swp
+*.swo
+*~
+
+# OS metadata
+.DS_Store
+._*
+.Spotlight-V100/
+.Trashes/
+Thumbs.db
+Desktop.ini
+
+# Logs and temporary files
+*.log
+*.tmp
+*.temp
+
+# Local environment and SD-card runtime data
+.env
+.env.*
+!.env.example
+!.env.sample
+wifi-password.txt
+state-a.json
+state-b.json
+
+# Device captures, controller exports and personal backups
+/logs/
+/captures/
+/diagnostics/
+/backups/
+/local/
+/private/
+/sd/
+/sd-card/
+/vesc-*.json
+/vesc_*.json
+/vesc-*.jsonl
+/vesc_*.jsonl
+/vesc-*.xml
+/vesc_*.xml
+/VESC*.xml
+/MCConfiguration*.xml
+/APPConfiguration*.xml
+/wheel-speed-*.json
+/wheel-speed-*.jsonl
+*.core
+*.dmp
+*.dump
+
+# Private credentials and signing keys
+secrets.json
+secrets.toml
+secrets.yaml
+secrets.yml
+secrets.ini
+*.key
+*.pem
+*.p12
+*.pfx
+id_rsa
+id_ed25519
+
+# Local assistant/session configuration
+/.codex/
+/.agents/
