@@ -1,0 +1,55 @@
+<globals>
+    <consts>
+        <color name="color_bg" value="0x06121e" />
+        <color name="color_text" value="0xe9f4ff" />
+        <color name="color_muted" value="0x90a9bc" />
+        <color name="color_cyan" value="0x27c4f5" />
+        <color name="color_red" value="0xff6554" />
+    </consts>
+    <subjects>
+        <int name="demo_speed" value="42" />
+        <int name="demo_battery" value="82" />
+        <int name="demo_mode" value="1" />
+        <int name="demo_limit" value="50" />
+        <int name="demo_meter" value="0" />
+        <int name="demo_hazard" value="0" />
+        <int name="demo_blink_on" value="450" />
+        <int name="demo_blink_off" value="450" />
+        <int name="demo_hold" value="2000" />
+        <int name="demo_double" value="300" />
+    </subjects>
+    <images>
+        <convert src="images/background-source.png" dest="images/background.png" width="480" height="320" />
+        <data name="dashboard_background" src_path="images/background.png" color_format="rgb565" />
+        <data name="icon_left" src_path="images/left.png" color_format="a8" />
+        <data name="icon_right" src_path="images/right.png" color_format="a8" />
+        <data name="icon_position" src_path="images/position.png" color_format="a8" />
+        <data name="icon_low_beam" src_path="images/low_beam.png" color_format="a8" />
+        <data name="icon_high_beam" src_path="images/high_beam.png" color_format="a8" />
+        <data name="icon_brake" src_path="images/brake.png" color_format="a8" />
+        <data name="icon_warning" src_path="images/warning.png" color_format="a8" />
+        <data name="icon_hazard" src_path="images/hazard.png" color_format="a8" />
+        <data name="icon_battery" src_path="images/battery.png" color_format="a8" />
+        <data name="icon_thermometer" src_path="images/thermometer.png" color_format="a8" />
+    </images>
+    <fonts>
+        <bin name="ui_small" src_path="fonts/NotoSans.ttf" size="14" bpp="4" as_file="false" range="0x20-0x7f 0x400-0x45f" symbols="°−…" />
+        <bin name="ui_medium" src_path="fonts/Dashboard-Bold.ttf" size="20" bpp="4" as_file="false" range="0x20-0x7f 0x400-0x45f" symbols="°−…" />
+        <bin name="ui_value" src_path="fonts/Dashboard-Bold.ttf" size="32" bpp="4" as_file="false" range="0x20-0x7f" symbols="°−…" />
+        <bin name="ui_speed" src_path="fonts/Dashboard-Bold.ttf" size="72" bpp="4" as_file="false" range="0x2d 0x30-0x39" symbols="°−…" />
+    </fonts>
+    <styles>
+        <style name="card" bg_color="#color_bg" bg_opa="92%" border_color="0x315870" border_width="1" radius="12" pad_all="0" />
+        <style name="button" bg_color="0x112b3d" bg_grad_color="0x050e18" bg_grad_dir="ver" bg_opa="100%" border_color="0x37647e" border_width="1" radius="10" pad_all="0" shadow_width="0" />
+        <style name="selected" bg_color="0x084b69" border_color="#color_cyan" border_width="2" />
+        <style name="limit_selected" bg_color="0x491b20" border_color="#color_red" border_width="2" />
+        <style name="battery_fill" bg_color="0x31f29a" />
+        <style name="arc_indicator" arc_color="#color_red" arc_width="8" />
+        <style name="arc_knob" bg_opa="0%" border_width="0" shadow_width="0" />
+        <style name="minor_ticks" length="6" line_width="1" line_color="0x91b1c6" line_opa="50%" />
+        <style name="major_ticks" length="13" line_width="2" line_color="0xc5dfef" text_font="ui_small" text_color="0xbcd8ea" />
+        <style name="dot_selected_0" bg_color="#color_cyan" width="16" />
+        <style name="dot_selected_1" bg_color="#color_cyan" width="16" />
+        <style name="dot_selected_2" bg_color="#color_cyan" width="16" />
+    </styles>
+</globals>

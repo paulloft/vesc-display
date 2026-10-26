@@ -6,7 +6,6 @@ import json
 import os
 import shutil
 import subprocess
-import sys
 
 root = Path(__file__).resolve().parents[1]
 build = root / '.pio/build/jc3248w535'
@@ -17,8 +16,10 @@ shutil.copyfile(build/'firmware.bin', out/'firmware.bin')
 parts = [('0x0', build/'bootloader.bin'), ('0x8000', build/'partitions.bin'),
          ('0xe000', core/'packages/framework-arduinoespressif32/tools/partitions/boot_app0.bin'),
          ('0x10000', build/'firmware.bin')]
-command = [sys.executable, str(core/'packages/tool-esptoolpy/esptool.py'),
-           '--chip', 'esp32s3', 'merge_bin', '-o', str(out/'first-flash.bin')]
+tool = core/'packages/tool-esptool'/('esptool.exe' if os.name=='nt' else 'esptool')
+if not tool.exists():
+    raise SystemExit('PlatformIO 8 esptool is missing; run pio pkg install first')
+command = [str(tool), '--chip', 'esp32s3', 'merge-bin', '-o', str(out/'first-flash.bin')]
 for offset, file in parts:
     command += [offset, str(file)]
 subprocess.run(command, check=True)

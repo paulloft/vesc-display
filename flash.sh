@@ -9,10 +9,10 @@ usage() {
   cat <<'HELP'
 Прошивка дисплея JC3248W535 по USB-C.
 
-  ./fllash.sh                       Найти порт, собрать и прошить
-  ./fllash.sh --port /dev/cu.usbmodemXXXX
-  ./fllash.sh --monitor             После прошивки открыть монитор 115200 бод
-  ./fllash.sh --help
+  ./flash.sh                       Найти порт, собрать и прошить
+  ./flash.sh --port /dev/cu.usbmodemXXXX
+  ./flash.sh --monitor             После прошивки открыть монитор 115200 бод
+  ./flash.sh --help
 
 Если USB-порт не появляется: удерживайте BOOT, нажмите RST, отпустите BOOT.
 Выход из монитора: Ctrl+C.
@@ -79,7 +79,7 @@ for item in json.load(sys.stdin):
   if ((${#ports[@]} == 0)); then
     echo "USB-порт ESP32 не найден. Подключите дисплей USB-C кабелем с передачей данных." >&2
     echo "Если порт не появился: удерживайте BOOT, нажмите RST, отпустите BOOT." >&2
-    echo "Можно указать порт вручную: ./fllash.sh --port /dev/cu.usbmodemXXXX" >&2
+    echo "Можно указать порт вручную: ./flash.sh --port /dev/cu.usbmodemXXXX" >&2
     exit 1
   elif ((${#ports[@]} == 1)); then
     port="${ports[0]}"

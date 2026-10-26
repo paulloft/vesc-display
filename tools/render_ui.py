@@ -9,11 +9,11 @@ root = Path(__file__).resolve().parents[1]
 os.chdir(root)
 lvgl = root / '.pio/libdeps/jc3248w535/lvgl'
 assert lvgl.exists(), 'Run pio pkg install first'
-dest = root / 'build/host-ui'
+dest = root / 'build/host-ui-v9'
 dest.mkdir(parents=True, exist_ok=True)
 common = ['-O1', '-DLV_CONF_INCLUDE_SIMPLE', '-DLV_LVGL_H_INCLUDE_SIMPLE',
-          '-Itests/ui_stubs', '-Iinclude', '-I' + str(lvgl)]
-sources = list((lvgl/'src').rglob('*.c')) + list((root/'src').glob('font_*.c')) + [root/'src/dashboard_background.c', root/'src/icon_assets.c', root/'src/Ui.cpp', root/'tests/ui_render.cpp']
+          '-Itests/ui_stubs', '-Iinclude', '-I' + str(lvgl), '-I' + str(lvgl/'include')]
+sources = list((lvgl/'src').rglob('*.c')) + list((root/'src').glob('font_*.c')) + [root/'src/dashboard_background.c', root/'src/icon_assets.c', root/'src/UiAllocator.c', root/'src/Ui.cpp', root/'tests/ui_render.cpp']
 
 def compile_one(pair):
     i, source = pair
@@ -31,6 +31,6 @@ with ThreadPoolExecutor(max_workers=8) as pool:
     objects = list(pool.map(compile_one, enumerate(sources)))
 subprocess.run(['c++', *objects, '-o', str(dest/'render')], check=True)
 subprocess.run([str(dest/'render')], check=True)
-for name in ('main', 'settings', 'diagnostics', 'alerts'):
+for name in ('main', 'settings', 'diagnostics', 'alerts', 'stats'):
     subprocess.run(['sips', '-s', 'format', 'png', f'build/ui-{name}.ppm', '--out', f'build/ui-{name}.png'], check=True, capture_output=True)
-print('Rendered build/ui-{main,settings,diagnostics,alerts}.png')
+print('Rendered build/ui-{main,settings,diagnostics,alerts,stats}.png')

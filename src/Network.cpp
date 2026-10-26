@@ -1,4 +1,4 @@
-#include "Network.h"
+#include "BikeNetwork.h"
 #include <WiFi.h>
 #include <Update.h>
 #include <esp_system.h>
@@ -14,8 +14,8 @@ body{font:16px system-ui;background:#07111b;color:#e9f4ff;max-width:650px;margin
 document.querySelector('#settings').onsubmit=async e=>{e.preventDefault();let body={};for(let x of e.target.elements)if(x.name)body[x.name]=x.type==='checkbox'?x.checked:Number(x.value);let r=await fetch('/api/settings',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});document.querySelector('#result').textContent=await r.text()};
 document.querySelector('#ota').onsubmit=async e=>{e.preventDefault();let r=await fetch('/update',{method:'POST',body:new FormData(e.target)});document.querySelector('#result').textContent=await r.text()};</script></html>)HTML";
 }
-bool Network::auth(){if(server_.authenticate("admin",password_.c_str()))return true;server_.requestAuthentication();return false;}
-void Network::begin(GetStatus status,Apply apply,Ready ready,Ready otaReady,Prepare prepare,bool storageAvailable) {
+bool BikeNetwork::auth(){if(server_.authenticate("admin",password_.c_str()))return true;server_.requestAuthentication();return false;}
+void BikeNetwork::begin(GetStatus status,Apply apply,Ready ready,Ready otaReady,Prepare prepare,bool storageAvailable) {
   char suffix[9];snprintf(suffix,sizeof(suffix),"%06X",unsigned(ESP.getEfuseMac()&0xffffff));
   ssid=String("Ebike-")+suffix;
   WiFi.persistent(false);WiFi.mode(WIFI_AP);

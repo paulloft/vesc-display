@@ -1,0 +1,168 @@
+<screen>
+    <view width="480" height="320" style_bg_color="#color_bg" style_pad_all="0" style_border_width="0" scrollable="false" style_text_font="ui_small">
+        <lv_image name="background" src="dashboard_background" x="0" y="0" width="480" height="320" inner_align="stretch" clickable="false" />
+        <lv_image name="status_left" src="icon_left" x="6" y="0" clickable="false" style_image_recolor="0x354b5a" style_image_recolor_opa="100%" />
+        <lv_image name="status_position" src="icon_position" x="78" y="0" clickable="false" style_image_recolor="0x31f29a" style_image_recolor_opa="100%" />
+        <lv_image name="status_low_beam" src="icon_low_beam" x="150" y="0" clickable="false" style_image_recolor="0xe3f3ff" style_image_recolor_opa="100%" />
+        <lv_image name="status_high_beam" src="icon_high_beam" x="222" y="0" clickable="false" style_image_recolor="0x354b5a" style_image_recolor_opa="100%" />
+        <lv_image name="status_brake" src="icon_brake" x="294" y="0" clickable="false" style_image_recolor="0x354b5a" style_image_recolor_opa="100%" />
+        <lv_image name="status_warning" src="icon_warning" x="366" y="0" clickable="false" style_image_recolor="0x354b5a" style_image_recolor_opa="100%" />
+        <lv_image name="status_right" src="icon_right" x="438" y="0" clickable="false" style_image_recolor="0x354b5a" style_image_recolor_opa="100%" />
+        <lv_obj name="battery_card" x="8" y="35" width="112" height="70" scrollable="false">
+            <style name="card" />
+            <lv_label name="battery_title" text="ЗАРЯД" x="40" y="4" width="69" style_text_font="ui_small" style_text_color="#color_text" clickable="false" />
+            <lv_label name="battery_value" text="82%" x="40" y="20" width="69" style_text_font="ui_value" style_text_color="#color_text" clickable="false" />
+            <lv_bar name="battery_fill" x="15" y="17" width="14" height="33" min_value="0" max_value="100" bind_value="demo_battery" style_bg_color="0x152a38">
+                <style name="battery_fill" selector="indicator" />
+            </lv_bar>
+            <lv_image name="battery_frame" src="icon_battery" x="8" y="5" clickable="false" style_image_recolor="0xbdd9e8" style_image_recolor_opa="100%" />
+        </lv_obj>
+        <lv_obj name="temperatures" x="8" y="113" width="112" height="100" scrollable="false">
+            <style name="card" />
+            <lv_label name="motor_caption" text="МОТОР" x="37" y="4" width="75" style_text_font="ui_small" style_text_color="#color_text" clickable="false" />
+            <lv_label name="motor_value" text="48°C" x="37" y="20" width="75" style_text_font="ui_medium" style_text_color="#color_text" clickable="false" />
+            <lv_image name="motor_icon" src="icon_thermometer" x="8" y="7" clickable="false" style_image_recolor="0xff9c60" style_image_recolor_opa="100%" />
+            <lv_label name="controller_caption" text="КОНТР." x="37" y="53" width="75" style_text_font="ui_small" style_text_color="#color_text" clickable="false" />
+            <lv_label name="controller_value" text="38°C" x="37" y="69" width="75" style_text_font="ui_medium" style_text_color="#color_text" clickable="false" />
+            <lv_image name="controller_icon" src="icon_thermometer" x="8" y="56" clickable="false" style_image_recolor="0xff9c60" style_image_recolor_opa="100%" />
+        </lv_obj>
+        <lv_arc name="speed_arc" x="125" y="35" width="221" height="221" rotation="150" bg_start_angle="0" bg_end_angle="240" min_value="0" max_value="100" bind_value="demo_speed" clickable="false" style_pad_all="4" style_arc_color="0x233f51" style_arc_width="8">
+            <style name="arc_indicator" selector="indicator" />
+            <style name="arc_knob" selector="knob" />
+        </lv_arc>
+        <lv_scale name="speed_ticks" x="125" y="35" width="221" height="221" mode="round_inner" total_tick_count="51" major_tick_every="10" min_value="0" max_value="100" angle_range="240" rotation="150" label_show="true" style_pad_all="14" style_arc_opa="0%" style_line_width="0" clickable="false">
+            <style name="minor_ticks" selector="items" />
+            <style name="major_ticks" selector="indicator" />
+        </lv_scale>
+        <lv_label name="speed_value" text="42" x="143" y="91" width="186" style_text_font="ui_speed" style_text_color="#color_text" clickable="false" style_text_align="center" bind_text="demo_speed" />
+        <lv_label name="speed_units" text="КМ/Ч" x="176" y="165" width="120" style_text_font="ui_small" style_text_color="#color_text" clickable="false" style_text_align="center" />
+        <lv_obj name="current_mode" x="184" y="202" width="104" height="29" scrollable="false" style_border_color="#color_cyan" style_border_width="2">
+            <style name="card" />
+            <lv_label name="mode_N" text="N" x="0" y="0" width="content" style_text_font="ui_medium" style_text_color="#color_text" clickable="false" align="center">
+                <bind_flag_if_not_eq subject="demo_mode" flag="hidden" ref_value="0" />
+            </lv_label>
+            <lv_label name="mode_Drive" text="Drive" x="0" y="0" width="content" style_text_font="ui_medium" style_text_color="#color_text" clickable="false" align="center">
+                <bind_flag_if_not_eq subject="demo_mode" flag="hidden" ref_value="1" />
+            </lv_label>
+            <lv_label name="mode_Sport" text="Sport" x="0" y="0" width="content" style_text_font="ui_medium" style_text_color="#color_text" clickable="false" align="center">
+                <bind_flag_if_not_eq subject="demo_mode" flag="hidden" ref_value="2" />
+            </lv_label>
+        </lv_obj>
+        <lv_obj name="odometer" x="351" y="35" width="121" height="102" scrollable="false">
+            <style name="card" />
+            <lv_label name="meter_0_title" text="ПОЕЗДКА" x="0" y="5" width="119" style_text_font="ui_small" style_text_color="#color_text" clickable="false" style_text_align="center">
+                <bind_flag_if_not_eq subject="demo_meter" flag="hidden" ref_value="0" />
+            </lv_label>
+            <lv_label name="meter_0_value" text="24.8" x="0" y="28" width="119" style_text_font="ui_value" style_text_color="#color_text" clickable="false" style_text_align="center">
+                <bind_flag_if_not_eq subject="demo_meter" flag="hidden" ref_value="0" />
+            </lv_label>
+            <lv_label name="meter_0_unit" text="КМ" x="0" y="65" width="119" style_text_font="ui_small" style_text_color="#color_text" clickable="false" style_text_align="center">
+                <bind_flag_if_not_eq subject="demo_meter" flag="hidden" ref_value="0" />
+            </lv_label>
+            <lv_label name="meter_1_title" text="ОБЩИЙ" x="0" y="5" width="119" style_text_font="ui_small" style_text_color="#color_text" clickable="false" style_text_align="center">
+                <bind_flag_if_not_eq subject="demo_meter" flag="hidden" ref_value="1" />
+            </lv_label>
+            <lv_label name="meter_1_value" text="1524.7" x="0" y="28" width="119" style_text_font="ui_value" style_text_color="#color_text" clickable="false" style_text_align="center">
+                <bind_flag_if_not_eq subject="demo_meter" flag="hidden" ref_value="1" />
+            </lv_label>
+            <lv_label name="meter_1_unit" text="КМ" x="0" y="65" width="119" style_text_font="ui_small" style_text_color="#color_text" clickable="false" style_text_align="center">
+                <bind_flag_if_not_eq subject="demo_meter" flag="hidden" ref_value="1" />
+            </lv_label>
+            <lv_label name="meter_2_title" text="ВРЕМЯ" x="0" y="5" width="119" style_text_font="ui_small" style_text_color="#color_text" clickable="false" style_text_align="center">
+                <bind_flag_if_not_eq subject="demo_meter" flag="hidden" ref_value="2" />
+            </lv_label>
+            <lv_label name="meter_2_value" text="01:23" x="0" y="28" width="119" style_text_font="ui_value" style_text_color="#color_text" clickable="false" style_text_align="center">
+                <bind_flag_if_not_eq subject="demo_meter" flag="hidden" ref_value="2" />
+            </lv_label>
+            <lv_label name="meter_2_unit" text="ЧАС : МИН" x="0" y="65" width="119" style_text_font="ui_small" style_text_color="#color_text" clickable="false" style_text_align="center">
+                <bind_flag_if_not_eq subject="demo_meter" flag="hidden" ref_value="2" />
+            </lv_label>
+            <lv_button name="meter_dot_0" x="25" y="83" width="20" height="16" scrollable="false" style_bg_opa="0%" style_border_width="0">
+                <style name="button" />
+                <lv_label name="meter_dot_0_text" text="" x="0" y="0" width="content" style_text_font="ui_medium" style_text_color="#color_text" clickable="false" align="center" style_text_align="center" />
+                <subject_set_int_event subject="demo_meter" value="0" />
+                <lv_obj name="dot_0" align="center" width="5" height="5" style_radius="100" style_pad_all="0" style_border_width="0" style_bg_color="0x375469" clickable="false" scrollable="false">
+                    <bind_style name="dot_selected_0" subject="demo_meter" ref_value="0" />
+                </lv_obj>
+            </lv_button>
+            <lv_button name="meter_dot_1" x="49" y="83" width="20" height="16" scrollable="false" style_bg_opa="0%" style_border_width="0">
+                <style name="button" />
+                <lv_label name="meter_dot_1_text" text="" x="0" y="0" width="content" style_text_font="ui_medium" style_text_color="#color_text" clickable="false" align="center" style_text_align="center" />
+                <subject_set_int_event subject="demo_meter" value="1" />
+                <lv_obj name="dot_1" align="center" width="5" height="5" style_radius="100" style_pad_all="0" style_border_width="0" style_bg_color="0x375469" clickable="false" scrollable="false">
+                    <bind_style name="dot_selected_1" subject="demo_meter" ref_value="1" />
+                </lv_obj>
+            </lv_button>
+            <lv_button name="meter_dot_2" x="73" y="83" width="20" height="16" scrollable="false" style_bg_opa="0%" style_border_width="0">
+                <style name="button" />
+                <lv_label name="meter_dot_2_text" text="" x="0" y="0" width="content" style_text_font="ui_medium" style_text_color="#color_text" clickable="false" align="center" style_text_align="center" />
+                <subject_set_int_event subject="demo_meter" value="2" />
+                <lv_obj name="dot_2" align="center" width="5" height="5" style_radius="100" style_pad_all="0" style_border_width="0" style_bg_color="0x375469" clickable="false" scrollable="false">
+                    <bind_style name="dot_selected_2" subject="demo_meter" ref_value="2" />
+                </lv_obj>
+            </lv_button>
+        </lv_obj>
+        <lv_button name="hazard" x="351" y="145" width="121" height="68" scrollable="false">
+            <style name="button" />
+            <lv_label name="hazard_text" text="" x="0" y="0" width="content" style_text_font="ui_medium" style_text_color="#color_text" clickable="false" align="center" style_text_align="center" />
+            <lv_image name="hazard_icon" src="icon_hazard" x="28" y="6" clickable="false" style_image_recolor="0xd1aa76" style_image_recolor_opa="100%" />
+            <subject_toggle_event subject="demo_hazard" />
+            <bind_state_if_eq subject="demo_hazard" state="checked" ref_value="1" />
+            <style name="limit_selected" selector="checked" />
+        </lv_button>
+        <lv_label name="status_line" text="ПРЕДПРОСМОТР · тестовые показания" x="8" y="233" width="464" style_text_font="ui_small" style_text_color="#color_muted" clickable="false" />
+        <lv_obj name="footer" x="4" y="250" width="472" height="70" scrollable="false">
+            <style name="card" />
+        </lv_obj>
+        <lv_button name="select_N" x="8" y="254" width="52" height="62" scrollable="false">
+            <style name="button" />
+            <lv_label name="select_N_text" text="N" x="0" y="0" width="content" style_text_font="ui_medium" style_text_color="#color_text" clickable="false" align="center" style_text_align="center" />
+            <style name="selected" selector="checked" />
+            <bind_state_if_eq subject="demo_mode" state="checked" ref_value="0" />
+            <subject_set_int_event subject="demo_mode" value="0" />
+        </lv_button>
+        <lv_button name="select_Drive" x="66" y="254" width="72" height="62" scrollable="false">
+            <style name="button" />
+            <lv_label name="select_Drive_text" text="Drive" x="0" y="0" width="content" style_text_font="ui_medium" style_text_color="#color_text" clickable="false" align="center" style_text_align="center" />
+            <style name="selected" selector="checked" />
+            <bind_state_if_eq subject="demo_mode" state="checked" ref_value="1" />
+            <subject_set_int_event subject="demo_mode" value="1" />
+        </lv_button>
+        <lv_button name="select_Sport" x="144" y="254" width="72" height="62" scrollable="false">
+            <style name="button" />
+            <lv_label name="select_Sport_text" text="Sport" x="0" y="0" width="content" style_text_font="ui_medium" style_text_color="#color_text" clickable="false" align="center" style_text_align="center" />
+            <style name="selected" selector="checked" />
+            <bind_state_if_eq subject="demo_mode" state="checked" ref_value="2" />
+            <subject_set_int_event subject="demo_mode" value="2" />
+        </lv_button>
+        <lv_obj name="footer_separator" x="225" y="257" width="1" height="56" style_bg_color="0x447b98" style_bg_opa="100%" style_border_width="0" style_pad_all="0" scrollable="false" />
+        <lv_button name="limit_25" x="235" y="254" width="55" height="62" scrollable="false">
+            <style name="button" />
+            <lv_label name="limit_25_text" text="25" x="0" y="0" width="content" style_text_font="ui_medium" style_text_color="#color_text" clickable="false" align="center" style_text_align="center" />
+            <style name="limit_selected" selector="checked" />
+            <bind_state_if_eq subject="demo_limit" state="checked" ref_value="25" />
+            <subject_set_int_event subject="demo_limit" value="25" />
+        </lv_button>
+        <lv_button name="limit_50" x="295" y="254" width="55" height="62" scrollable="false">
+            <style name="button" />
+            <lv_label name="limit_50_text" text="50" x="0" y="0" width="content" style_text_font="ui_medium" style_text_color="#color_text" clickable="false" align="center" style_text_align="center" />
+            <style name="limit_selected" selector="checked" />
+            <bind_state_if_eq subject="demo_limit" state="checked" ref_value="50" />
+            <subject_set_int_event subject="demo_limit" value="50" />
+        </lv_button>
+        <lv_button name="limit_70" x="355" y="254" width="55" height="62" scrollable="false">
+            <style name="button" />
+            <lv_label name="limit_70_text" text="70" x="0" y="0" width="content" style_text_font="ui_medium" style_text_color="#color_text" clickable="false" align="center" style_text_align="center" />
+            <style name="limit_selected" selector="checked" />
+            <bind_state_if_eq subject="demo_limit" state="checked" ref_value="70" />
+            <subject_set_int_event subject="demo_limit" value="70" />
+        </lv_button>
+        <lv_button name="limit_0" x="415" y="254" width="55" height="62" scrollable="false">
+            <style name="button" />
+            <lv_label name="limit_0_text" text="MAX" x="0" y="0" width="content" style_text_font="ui_medium" style_text_color="#color_text" clickable="false" align="center" style_text_align="center" />
+            <style name="limit_selected" selector="checked" />
+            <bind_state_if_eq subject="demo_limit" state="checked" ref_value="0" />
+            <subject_set_int_event subject="demo_limit" value="0" />
+        </lv_button>
+    </view>
+</screen>

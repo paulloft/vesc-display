@@ -1,19 +1,33 @@
 #include "Devices.h"
 #include "Board.h"
-#include <driver/adc.h>
+#include <esp_adc/adc_oneshot.h>
+#include <esp_adc/adc_cali.h>
+#include <esp_adc/adc_cali_scheme.h>
 #include <driver/gpio.h>
-#include <esp_adc_cal.h>
+
 namespace {
-esp_adc_cal_characteristics_t keyCalibration;
+adc_oneshot_unit_handle_t keyAdc=nullptr;
+adc_cali_handle_t keyCalibration=nullptr;
+uint16_t keyVoltage(int raw) {
+  int mv=0;
+  if(keyCalibration&&adc_cali_raw_to_voltage(keyCalibration,raw,&mv)==ESP_OK)return uint16_t(mv);
+  // ESP32-S3 nominal 6 dB range; per-device eFuse calibration is preferred.
+  return uint16_t(uint32_t(raw)*1750/4095);
+}
+int keyRaw() {
+  int raw=4095; // Failed reads release the ladder instead of inventing a press.
+  if(keyAdc)adc_oneshot_read(keyAdc,ADC_CHANNEL_5,&raw);
+  return raw;
+}
 struct AdcSample {uint16_t raw;uint16_t noiseMv;};
 AdcSample readKeyAdc() {
   // Give the sample capacitor multiple conversions to settle on the weak source.
-  (void)adc1_get_raw(ADC1_CHANNEL_5);
+  (void)keyRaw();
   uint16_t values[9];
-  for(auto& value:values){delayMicroseconds(5);value=adc1_get_raw(ADC1_CHANNEL_5);}
+  for(auto& value:values){delayMicroseconds(5);value=keyRaw();}
   uint16_t raw=bike::trimmedAdcMean(values);
-  return {raw,uint16_t(esp_adc_cal_raw_to_voltage(values[8],&keyCalibration)-
-                                     esp_adc_cal_raw_to_voltage(values[0],&keyCalibration))};
+  return {raw,uint16_t(keyVoltage(values[8])-
+                                     keyVoltage(values[0]))};
 }
 }
 
@@ -25,7 +39,8 @@ void Loads::begin(){bus_.begin(board::ioSda,board::ioScl,100000);bus_.setTimeOut
 void Loads::off(){if(initialized_) {online=write(0x0a,0);sent_=0;}}
 void Loads::tick(bike::State& state,const bike::Config& cfg,uint32_t now) {
   if(!initialized_) {
-    if(now-retry_<1000)return;retry_=now;
+    if(now-retry_<1000)return;
+    retry_=now;
     initialized_=write(0x0a,0)&&write(0x01,0)&&write(0x02,0)&&write(0x06,0)&&write(0,0x40);
     online=initialized_;sent_=0;
     if(!initialized_)return;
@@ -38,7 +53,8 @@ void Loads::tick(bike::State& state,const bike::Config& cfg,uint32_t now) {
     sent_=desired;
     for(int i=0;i<7;i++)if(bits[i]>=0 && ((desired^previous)&desired&(1<<bits[i])))onAt_[i]=now;
   }
-  if(now-poll_<5)return;poll_=now;
+  if(now-poll_<5)return;
+  poll_=now;
   bus_.beginTransmission(0x20);bus_.write(0x09);
   if(bus_.endTransmission(false)==0 && bus_.requestFrom(uint8_t(0x20),uint8_t(1))==1) {
     bool b=bus_.read()&0x40;if(b&&!brake)onAt_[5]=now;brake=b;online=true;
@@ -62,17 +78,21 @@ void Loads::tick(bike::State& state,const bike::Config& cfg,uint32_t now) {
 void Keys::begin() {
   pinMode(board::keyPower,INPUT_PULLUP);pinMode(board::keyMode,INPUT_PULLUP);
   pinMode(board::keyPullup,INPUT_PULLUP);
-  // Configure once: Arduino analogReadMilliVolts reconfigures and characterizes
-  // the ADC on every sample. GPIO6 is ADC1 channel 5, independent of Wi-Fi.
-  adc1_config_width(ADC_WIDTH_BIT_12);
-  adc1_config_channel_atten(ADC1_CHANNEL_5,ADC_ATTEN_DB_6);
-  esp_adc_cal_characterize(ADC_UNIT_1,ADC_ATTEN_DB_6,ADC_WIDTH_BIT_12,1100,&keyCalibration);
+  // ADC1 channel 5 is GPIO6 and stays available while Wi-Fi is active.
+  // Create/calibrate once; the core 0 worker only performs conversions.
+  adc_oneshot_unit_init_cfg_t unit{};unit.unit_id=ADC_UNIT_1;
+  ESP_ERROR_CHECK(adc_oneshot_new_unit(&unit,&keyAdc));
+  adc_oneshot_chan_cfg_t channel{};channel.atten=ADC_ATTEN_DB_6;channel.bitwidth=ADC_BITWIDTH_12;
+  ESP_ERROR_CHECK(adc_oneshot_config_channel(keyAdc,ADC_CHANNEL_5,&channel));
+  adc_cali_curve_fitting_config_t calibration{};calibration.unit_id=ADC_UNIT_1;calibration.chan=ADC_CHANNEL_5;
+  calibration.atten=ADC_ATTEN_DB_6;calibration.bitwidth=ADC_BITWIDTH_12;
+  adc_cali_create_scheme_curve_fitting(&calibration,&keyCalibration);
   // Passive continuity hint: with all keys released, IO6 should follow the
   // IO9 pull-down/up change. Never drive the remote net as an output.
   gpio_set_pull_mode(gpio_num_t(board::keyPullup),GPIO_PULLDOWN_ONLY);delay(8);
-  pullupDownMv=esp_adc_cal_raw_to_voltage(readKeyAdc().raw,&keyCalibration);
+  pullupDownMv=keyVoltage(readKeyAdc().raw);
   gpio_set_pull_mode(gpio_num_t(board::keyPullup),GPIO_PULLUP_ONLY);delay(8);
-  pullupUpMv=esp_adc_cal_raw_to_voltage(readKeyAdc().raw,&keyCalibration);
+  pullupUpMv=keyVoltage(readKeyAdc().raw);
   events_=xQueueCreate(64,sizeof(bike::Event));
   if(events_&&xTaskCreatePinnedToCore(worker,"remote-keys",4096,this,1,nullptr,0)!=pdPASS){vQueueDelete(events_);events_=nullptr;}
 }
@@ -96,10 +116,11 @@ void Keys::tick(uint32_t now,const bike::Config& c,bike::EventSink sink,void* ct
   while(xQueueReceive(events_,&event,0)==pdTRUE)sink(event,ctx);
 }
 void Keys::sample(uint32_t now,const bike::Config& c,bike::EventSink sink,void* ctx) {
-  if(now-last_<5)return;last_=now;
+  if(now-last_<5)return;
+  last_=now;
   pullupDigital=digitalRead(board::keyPullup);
   auto adc=readKeyAdc();
-  ladder_.sample(esp_adc_cal_raw_to_voltage(adc.raw,&keyCalibration),adc.raw>=4080,
+  ladder_.sample(keyVoltage(adc.raw),adc.raw>=4080,
                  adc.noiseMv,now,c,sink,ctx);
   millivolts=ladder_.filteredMv;rawMillivolts=ladder_.rawMv;noiseMillivolts=ladder_.noiseMv;
   resistance=ladder_.resistance;decoded=ladder_.decoded;

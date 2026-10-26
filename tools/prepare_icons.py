@@ -51,15 +51,15 @@ for name,alpha in icons.items():
     desired=((canvas.width-1)/2,(canvas.height-1)/2)
     assert max(abs(a-b) for a,b in zip(center,desired))<=0.5,(name,bounds,center,desired)
     manifest[name]={'size':canvas_size,'visible_bounds':bounds,'center':center,'cell_center':desired}
-    # LV_COLOR_DEPTH=16: little-endian RGB565 followed by an 8-bit alpha byte.
+    # A8 mask: LVGL 9 recolors the raster without allocating RGBA layers.
     data=bytearray()
-    for value in centered.get_flattened_data():data.extend((255,255,value))
+    for value in centered.get_flattened_data():data.append(value)
     source.append(f'static const uint8_t pixels_{name}[] = {{')
     source.extend(','.join(str(value) for value in data[i:i+36])+',' for i in range(0,len(data),36))
-    source.extend(['};',f'const lv_img_dsc_t icon_{name} = {{',
-      f' .header = {{.cf=LV_IMG_CF_TRUE_COLOR_ALPHA,.always_zero=0,.reserved=0,.w={canvas.width},.h={canvas.height}}},',
+    source.extend(['};',f'const lv_image_dsc_t icon_{name} = {{',
+      f' .header = {{.magic=LV_IMAGE_HEADER_MAGIC,.cf=LV_COLOR_FORMAT_A8,.w={canvas.width},.h={canvas.height},.stride={canvas.width}}},',
       f' .data_size=sizeof(pixels_{name}), .data=pixels_{name}', '};',''])
-    header.append(f'LV_IMG_DECLARE(icon_{name});')
+    header.append(f'LV_IMAGE_DECLARE(icon_{name});')
 (root/'src/icon_assets.c').write_text('\n'.join(source))
 (root/'include/IconAssets.h').write_text('\n'.join(header)+'\n')
 (assets/'manifest.json').write_text(json.dumps(manifest,indent=2)+'\n')

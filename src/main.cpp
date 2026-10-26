@@ -6,7 +6,7 @@
 #include "Storage.h"
 #include "Ui.h"
 #include "Vesc.h"
-#include "Network.h"
+#include "BikeNetwork.h"
 #include <WiFi.h>
 
 namespace {
@@ -17,7 +17,7 @@ Loads loads;
 Storage storage;
 Ui ui;
 Vesc vesc;
-Network network;
+BikeNetwork network;
 bool uiReady=false,previousFresh=false;
 bool previousApplied=false;
 uint32_t lastUi=0,lastSample=0;
@@ -40,10 +40,11 @@ void setLimit(uint8_t value) {
 }
 void action(UiAction a) {
   if(network.updating)return;
-  if(a==UiAction::ToggleControl) {
+  if(a==UiAction::ToggleControl||a==UiAction::ToggleCruise) {
     if(!stationary()){notify("Остановитесь и выберите N; нужна связь с VESC");return;}
     String result;
-    applyConfig(config.motionEnabled?"{\"motion_enabled\":false}":"{\"motion_enabled\":true}",result);
+    if(a==UiAction::ToggleCruise)applyConfig(config.cruiseEnabled?"{\"cruise_enabled\":false}":"{\"cruise_enabled\":true}",result);
+    else applyConfig(config.motionEnabled?"{\"motion_enabled\":false}":"{\"motion_enabled\":true}",result);
     notify(result);return;
   }
   if(a==UiAction::Neutral)setMode(bike::Mode::N);
@@ -52,6 +53,7 @@ void action(UiAction a) {
   if(a>=UiAction::Limit25&&a<=UiAction::LimitMax) {const uint8_t values[]={25,50,70,0};setLimit(values[int(a)-3]);}
   if(a==UiAction::Hazard)state.turnKey(bike::Turn::Hazard);
   if(a==UiAction::Meter){state.meterPage=(state.meterPage+1)%3;storage.save(config,state,true);}
+  if(a>=UiAction::MeterTrip&&a<=UiAction::MeterTime){state.meterPage=int(a)-int(UiAction::MeterTrip);storage.save(config,state,true);}
   if(a==UiAction::Save) {
     bool saved=storage.save(config,state,true);
     notify(saved?"Настройки сохранены на SD":"Настройки применены в RAM; SD недоступна");
@@ -131,6 +133,7 @@ String statusJson() {
   pullup["min"]=10000;pullup["max"]=100000;pullup["step"]=100;
   auto flip=fields.add<JsonObject>();flip["key"]="screen_flipped";flip["label"]="Перевернуть экран";flip["type"]="boolean";
   auto control=fields.add<JsonObject>();control["key"]="motion_enabled";control["label"]="Управление VESC (режимы и лимиты)";control["type"]="boolean";
+  auto cruise=fields.add<JsonObject>();cruise["key"]="cruise_enabled";cruise["label"]="Круиз-контроль";cruise["type"]="boolean";
   encodeConfig(d["config"].to<JsonObject>(),config);String out;serializeJson(d,out);return out;
 }
 bool stationary() {
@@ -147,7 +150,8 @@ bool applyConfig(const String& json,String& result) {
   } else if(!wasEnabled&&config.motionEnabled)setMode(bike::Mode::N);
   if(!config.cruiseEnabled)vesc.cruise(false);
   bool saved=storage.save(config,state,true);result=saved?"Сохранено на SD":"Применено в RAM; SD недоступна";
-  if(uiReady)ui.show(1);return true;
+  if(uiReady)ui.show(1);
+  return true;
 }
 // Nonblocking USB settings line, using the same validation/storage as Wi-Fi.
 // Bare 'd' still returns status. A JSON object followed by newline applies settings.
@@ -158,6 +162,7 @@ void consoleTick() {
     char ch=Serial.read();
     if(!used&&!overflow) {
       if(ch=='d'){Serial.println(statusJson());continue;}
+      if(ch=='u'){if(uiReady&&state.mode==bike::Mode::N&&!network.updating)ui.benchmark([](int page,bool background,uint32_t elapsed){Serial.printf("UIBENCH page=%d background=%d elapsed=%lu ms\n",page,background,(unsigned long)elapsed);});continue;}
       if(ch!='{')continue;
     }
     if(ch=='\r')continue;
@@ -200,7 +205,11 @@ void updateTrip(uint32_t now) {
 }
 }
 void setup() {
+  Serial.setTxBufferSize(16384);
   Serial.begin(115200);
+  // Core 3 HWCDC can wait 20 x 100 ms when a USB monitor stops reading.
+  // Logging must never stall the screen, remote events or VESC polling.
+  Serial.setTxTimeoutMs(0);
   loads.begin();storage.begin(config,state);
   vesc.controlEnabled=config.motionEnabled;vesc.cruiseEnabled=config.cruiseEnabled;vesc.startupLimit(state.limit);vesc.begin(board::uartBaud,&config);
   network.begin(statusJson,applyConfig,stationary,otaReady,prepareUpdate,storage.mounted);
@@ -214,11 +223,13 @@ void setup() {
 void loop() {
   static uint32_t previousLoop=0,maxLoop=0,reportAt=0,maxUi=0;
   uint32_t now=millis();
-  if(previousLoop)maxLoop=std::max(maxLoop,now-previousLoop);previousLoop=now;
+  if(previousLoop)maxLoop=std::max(maxLoop,now-previousLoop);
+  previousLoop=now;
   if(now-reportAt>=5000) {
-    Serial.printf("PERF loop_max=%lu ms ui_max=%lu ms heap=%u min_heap=%u AP=%s clients=%u\n",
+    auto metrics=ui.takeMetrics();
+    Serial.printf("PERF loop_max=%lu ms ui_max=%lu ms heap=%u min_heap=%u AP=%s clients=%u frames=%lu pixels=%lu flush_max=%lu ms\n",
       (unsigned long)maxLoop,(unsigned long)maxUi,unsigned(ESP.getFreeHeap()),unsigned(ESP.getMinFreeHeap()),
-      network.online?"OK":"FAIL",unsigned(WiFi.softAPgetStationNum()));
+      network.online?"OK":"FAIL",unsigned(WiFi.softAPgetStationNum()),(unsigned long)metrics.frames,(unsigned long)metrics.pixels,(unsigned long)metrics.flushMs);
     maxLoop=maxUi=0;reportAt=now;
   }
   consoleTick();

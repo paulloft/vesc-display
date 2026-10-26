@@ -10,8 +10,8 @@ for r,g,b in image.get_flattened_data():
     data += value.to_bytes(2, 'little')
 lines = [', '.join(f'0x{x:02x}' for x in data[i:i+24]) for i in range(0,len(data),24)]
 source = '#include <lvgl.h>\n\nstatic const uint8_t pixels[] = {\n' + ',\n'.join(lines) + '\n};\n'
-source += '''const lv_img_dsc_t dashboard_background = {
- .header = {.cf = LV_IMG_CF_TRUE_COLOR, .always_zero = 0, .reserved = 0, .w = 480, .h = 320},
+source += '''const lv_image_dsc_t dashboard_background = {
+ .header = {.magic = LV_IMAGE_HEADER_MAGIC, .cf = LV_COLOR_FORMAT_RGB565, .w = 480, .h = 320, .stride = 960},
  .data_size = sizeof(pixels), .data = pixels
 };
 '''

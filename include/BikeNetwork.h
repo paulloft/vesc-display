@@ -2,7 +2,7 @@
 #include <Arduino.h>
 #include <WebServer.h>
 #include "Core.h"
-class Network {
+class BikeNetwork {
   WebServer server_{80};
   String password_;
   bool uploadAllowed_=false,uploadOk_=false;
