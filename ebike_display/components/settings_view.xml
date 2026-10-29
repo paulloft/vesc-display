@@ -1,0 +1,91 @@
+<component>
+  <view extends="lv_obj" width="480" height="320" scrollable="false" style_text_font="ui_small" style_bg_opa="100%" style_bg_color="#color_bg">
+    <style name="clear" />
+    <lv_label name="settings_title" text="НАСТРОЙКИ" x="12" y="28" width="300" style_text_font="ui_medium" style_text_color="#color_text" clickable="false" />
+    <lv_obj name="settings_list" x="4" y="57" width="472" height="211" scrollable="true">
+      <style name="clear" />
+      <lv_label name="timing_title_0" text="Поворотник: включён" x="12" y="16" width="210" style_text_font="ui_small" style_text_color="#color_text" clickable="false" />
+      <lv_label name="timing_value_0" text="450 мс" x="217" y="16" width="105" style_text_font="ui_small" style_text_color="#color_cyan" clickable="false" bind_text="ui_blink_on" bind_text-fmt="%d мс" style_text_align="right" />
+      <lv_button name="timing_minus_0" x="339" y="8" width="52" height="32" scrollable="false">
+        <style name="button" />
+        <lv_label name="timing_minus_0_text" text="-" x="0" y="0" width="content" style_text_font="ui_medium" style_text_color="#color_text" clickable="false" align="center" />
+        <subject_increment_event subject="ui_blink_on" step="-50" min_value="100" max_value="2000" rollover="false" />
+      </lv_button>
+      <lv_button name="timing_plus_0" x="400" y="8" width="52" height="32" scrollable="false">
+        <style name="button" />
+        <lv_label name="timing_plus_0_text" text="+" x="0" y="0" width="content" style_text_font="ui_medium" style_text_color="#color_text" clickable="false" align="center" />
+        <subject_increment_event subject="ui_blink_on" step="50" min_value="100" max_value="2000" rollover="false" />
+      </lv_button>
+      <lv_label name="timing_title_1" text="Поворотник: выключен" x="12" y="70" width="210" style_text_font="ui_small" style_text_color="#color_text" clickable="false" />
+      <lv_label name="timing_value_1" text="450 мс" x="217" y="70" width="105" style_text_font="ui_small" style_text_color="#color_cyan" clickable="false" bind_text="ui_blink_off" bind_text-fmt="%d мс" style_text_align="right" />
+      <lv_button name="timing_minus_1" x="339" y="62" width="52" height="32" scrollable="false">
+        <style name="button" />
+        <lv_label name="timing_minus_1_text" text="-" x="0" y="0" width="content" style_text_font="ui_medium" style_text_color="#color_text" clickable="false" align="center" />
+        <subject_increment_event subject="ui_blink_off" step="-50" min_value="100" max_value="2000" rollover="false" />
+      </lv_button>
+      <lv_button name="timing_plus_1" x="400" y="62" width="52" height="32" scrollable="false">
+        <style name="button" />
+        <lv_label name="timing_plus_1_text" text="+" x="0" y="0" width="content" style_text_font="ui_medium" style_text_color="#color_text" clickable="false" align="center" />
+        <subject_increment_event subject="ui_blink_off" step="50" min_value="100" max_value="2000" rollover="false" />
+      </lv_button>
+      <lv_label name="timing_title_2" text="Удержание кнопки" x="12" y="124" width="210" style_text_font="ui_small" style_text_color="#color_text" clickable="false" />
+      <lv_label name="timing_value_2" text="2000 мс" x="217" y="124" width="105" style_text_font="ui_small" style_text_color="#color_cyan" clickable="false" bind_text="ui_hold" bind_text-fmt="%d мс" style_text_align="right" />
+      <lv_button name="timing_minus_2" x="339" y="116" width="52" height="32" scrollable="false">
+        <style name="button" />
+        <lv_label name="timing_minus_2_text" text="-" x="0" y="0" width="content" style_text_font="ui_medium" style_text_color="#color_text" clickable="false" align="center" />
+        <subject_increment_event subject="ui_hold" step="-100" min_value="500" max_value="5000" rollover="false" />
+      </lv_button>
+      <lv_button name="timing_plus_2" x="400" y="116" width="52" height="32" scrollable="false">
+        <style name="button" />
+        <lv_label name="timing_plus_2_text" text="+" x="0" y="0" width="content" style_text_font="ui_medium" style_text_color="#color_text" clickable="false" align="center" />
+        <subject_increment_event subject="ui_hold" step="100" min_value="500" max_value="5000" rollover="false" />
+      </lv_button>
+      <lv_label name="timing_title_3" text="Двойное нажатие" x="12" y="178" width="210" style_text_font="ui_small" style_text_color="#color_text" clickable="false" />
+      <lv_label name="timing_value_3" text="300 мс" x="217" y="178" width="105" style_text_font="ui_small" style_text_color="#color_cyan" clickable="false" bind_text="ui_double" bind_text-fmt="%d мс" style_text_align="right" />
+      <lv_button name="timing_minus_3" x="339" y="170" width="52" height="32" scrollable="false">
+        <style name="button" />
+        <lv_label name="timing_minus_3_text" text="-" x="0" y="0" width="content" style_text_font="ui_medium" style_text_color="#color_text" clickable="false" align="center" />
+        <subject_increment_event subject="ui_double" step="-25" min_value="150" max_value="600" rollover="false" />
+      </lv_button>
+      <lv_button name="timing_plus_3" x="400" y="170" width="52" height="32" scrollable="false">
+        <style name="button" />
+        <lv_label name="timing_plus_3_text" text="+" x="0" y="0" width="content" style_text_font="ui_medium" style_text_color="#color_text" clickable="false" align="center" />
+        <subject_increment_event subject="ui_double" step="25" min_value="150" max_value="600" rollover="false" />
+      </lv_button>
+      <lv_label name="flip_switch_title" text="Перевернуть экран" x="12" y="221" width="335" style_text_font="ui_small" style_text_color="#color_text" clickable="false" />
+      <lv_switch name="flip_switch" x="390" y="216" width="66" height="34" bind_checked="ui_flip" style_bg_color="0x243c4d" style_anim_duration="0">
+        <style name="switch_track" />
+        <style name="switch_indicator" selector="indicator" />
+        <style name="switch_on" selector="checked" />
+        <style name="switch_knob" selector="knob" />
+      </lv_switch>
+      <lv_label name="control_switch_title" text="Управление VESC" x="12" y="271" width="335" style_text_font="ui_small" style_text_color="#color_text" clickable="false" />
+      <lv_switch name="control_switch" x="390" y="266" width="66" height="34" bind_checked="ui_motion" style_bg_color="0x243c4d" style_anim_duration="0">
+        <style name="switch_track" />
+        <style name="switch_indicator" selector="indicator" />
+        <style name="switch_on" selector="checked" />
+        <style name="switch_knob" selector="knob" />
+      </lv_switch>
+      <lv_label name="cruise_switch_title" text="Круиз-контроль" x="12" y="321" width="335" style_text_font="ui_small" style_text_color="#color_text" clickable="false" />
+      <lv_switch name="cruise_switch" x="390" y="316" width="66" height="34" bind_checked="ui_cruise" style_bg_color="0x243c4d" style_anim_duration="0">
+        <style name="switch_track" />
+        <style name="switch_indicator" selector="indicator" />
+        <style name="switch_on" selector="checked" />
+        <style name="switch_knob" selector="knob" />
+      </lv_switch>
+      <lv_label name="safe_switch_title" text="Безопасный режим" x="12" y="371" width="335" style_text_font="ui_small" style_text_color="#color_text" clickable="false" />
+      <lv_switch name="safe_switch" x="390" y="366" width="66" height="34" bind_checked="ui_safe" style_bg_color="0x243c4d" style_anim_duration="0">
+        <style name="switch_track" />
+        <style name="switch_indicator" selector="indicator" />
+        <style name="switch_on" selector="checked" />
+        <style name="switch_knob" selector="knob" />
+      </lv_switch>
+    </lv_obj>
+    <lv_label name="settings_hint" text="Изменения действуют сразу" x="12" y="288" width="300" style_text_font="ui_small" style_text_color="#color_text" clickable="false" />
+    <lv_button name="save_settings" x="335" y="278" width="133" height="38" scrollable="false">
+      <style name="button" />
+      <lv_label name="save_settings_text" text="Сохранить" x="0" y="0" width="content" style_text_font="ui_medium" style_text_color="#color_text" clickable="false" align="center" />
+      <subject_set_string_event subject="ui_notice" value="Изменения сохранены в предпросмотре" />
+    </lv_button>
+  </view>
+</component>

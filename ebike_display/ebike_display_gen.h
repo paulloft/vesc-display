@@ -83,7 +83,7 @@ extern lv_style_t card;
 extern lv_style_t button;
 extern lv_style_t selected;
 extern lv_style_t limit_selected;
-extern lv_style_t battery_fill;
+extern lv_style_t battery_fill_style;
 extern lv_style_t arc_indicator;
 extern lv_style_t arc_knob;
 extern lv_style_t minor_ticks;
@@ -91,6 +91,11 @@ extern lv_style_t major_ticks;
 extern lv_style_t dot_selected_0;
 extern lv_style_t dot_selected_1;
 extern lv_style_t dot_selected_2;
+extern lv_style_t clear;
+extern lv_style_t switch_track;
+extern lv_style_t switch_indicator;
+extern lv_style_t switch_on;
+extern lv_style_t switch_knob;
 
 /*----------------
  * Fonts
@@ -108,32 +113,40 @@ extern lv_font_t * ui_speed;
  *----------------*/
 
 /* Targets: any */
-extern const void * dashboard_background;
-extern const void * icon_left;
-extern const void * icon_right;
-extern const void * icon_position;
-extern const void * icon_low_beam;
-extern const void * icon_high_beam;
-extern const void * icon_brake;
-extern const void * icon_warning;
-extern const void * icon_hazard;
-extern const void * icon_battery;
-extern const void * icon_thermometer;
+extern const void * ui_img_background;
+extern const void * ui_img_left;
+extern const void * ui_img_right;
+extern const void * ui_img_position;
+extern const void * ui_img_low_beam;
+extern const void * ui_img_high_beam;
+extern const void * ui_img_brake;
+extern const void * ui_img_warning;
+extern const void * ui_img_hazard;
+extern const void * ui_img_battery;
+extern const void * ui_img_thermometer;
+extern const void * ui_img_switch_track;
+extern const void * ui_img_switch_knob;
 
 /*----------------
  * Subjects
  *----------------*/
 
-extern lv_subject_t demo_speed;
-extern lv_subject_t demo_battery;
-extern lv_subject_t demo_mode;
-extern lv_subject_t demo_limit;
-extern lv_subject_t demo_meter;
-extern lv_subject_t demo_hazard;
-extern lv_subject_t demo_blink_on;
-extern lv_subject_t demo_blink_off;
-extern lv_subject_t demo_hold;
-extern lv_subject_t demo_double;
+extern lv_subject_t ui_speed_value;
+extern lv_subject_t ui_battery;
+extern lv_subject_t ui_mode;
+extern lv_subject_t ui_limit;
+extern lv_subject_t ui_meter;
+extern lv_subject_t ui_hazard;
+extern lv_subject_t ui_blink_on;
+extern lv_subject_t ui_blink_off;
+extern lv_subject_t ui_hold;
+extern lv_subject_t ui_double;
+extern lv_subject_t ui_flip;
+extern lv_subject_t ui_motion;
+extern lv_subject_t ui_cruise;
+extern lv_subject_t ui_safe;
+extern lv_subject_t ui_mode_text;
+extern lv_subject_t ui_notice;
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -158,7 +171,15 @@ void ebike_display_init_gen(const char * asset_path);
  **********************/
 
 /*Include all the widgets, components and screens of this library*/
+#include "components/dashboard_view_gen.h"
+#include "components/diagnostics_view_gen.h"
+#include "components/settings_view_gen.h"
+#include "components/trip_view_gen.h"
+#include "screens/app_gen.h"
 #include "screens/dashboard_gen.h"
+#include "screens/diagnostics_gen.h"
+#include "screens/settings_gen.h"
+#include "screens/trip_gen.h"
 
 #ifdef __cplusplus
 } /*extern "C"*/

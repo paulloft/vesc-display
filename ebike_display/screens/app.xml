@@ -1,0 +1,45 @@
+<screen>
+	<view
+		width="480"
+		height="320"
+		scrollable="false"
+		style_pad_all="0"
+		style_border_width="0"
+		style_bg_color="#color_bg"
+		style_text_font="ui_small"
+	>
+		<lv_tabview name="app_pages" x="0" y="0" width="480" height="320">
+			<style name="clear" />
+			<lv_tabview-tab_bar height="0" hidden="true" style_pad_all="0" style_border_width="0" />
+			<lv_tabview-tab text="" name="app_page_0" scrollable="false">
+				<style name="clear" />
+				<dashboard_view name="page_view_0" />
+			</lv_tabview-tab>
+			<lv_tabview-tab text="" name="app_page_1" scrollable="false">
+				<style name="clear" />
+				<settings_view name="page_view_1" />
+			</lv_tabview-tab>
+			<lv_tabview-tab text="" name="app_page_2" scrollable="false">
+				<style name="clear" />
+				<diagnostics_view name="page_view_2" />
+			</lv_tabview-tab>
+			<lv_tabview-tab text="" name="app_page_3" scrollable="false">
+				<style name="clear" />
+				<trip_view name="page_view_3" />
+			</lv_tabview-tab>
+		</lv_tabview>
+		<lv_label
+			name="status_line"
+			text="ПРЕДПРОСМОТР · тестовые показания"
+			x="8"
+			y="231"
+			width="464"
+			style_text_font="ui_small"
+			style_text_color="#color_muted"
+			clickable="false"
+			bind_text="ui_notice"
+			height="18"
+			long_mode="dots"
+		/>
+	</view>
+</screen>

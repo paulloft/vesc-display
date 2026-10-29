@@ -36,12 +36,10 @@ static uint32_t ebike_display_target = EBIKE_DISPLAY_TARGET_ALL;
  *----------------*/
 
 #ifndef LV_EDITOR_PREVIEW
-    static const char * translation_languages[] = {"en", "de", NULL};
-    static const char * translation_tags[] = {"dog", "cat", "house", NULL};
+    static const char * translation_languages[] = {"ru", NULL};
+    static const char * translation_tags[] = {"app_title", NULL};
     static const char * translation_texts[] = {
-        "This is a dog", "Das ist ein Hund", /* dog */
-        "A curious little cat", "Eine neugierige kleine Katze", /* cat */
-        "The house is cozy and warm", "Das Haus ist gemütlich und warm", /* house */
+        "Велодисплей", /* app_title */
     };
 #endif
 
@@ -71,28 +69,32 @@ extern lv_font_t ui_speed_data;
  *----------------*/
 
 /* Targets: any */
-const void * dashboard_background = NULL;
-extern const void * dashboard_background_data;
-const void * icon_left = NULL;
-extern const void * icon_left_data;
-const void * icon_right = NULL;
-extern const void * icon_right_data;
-const void * icon_position = NULL;
-extern const void * icon_position_data;
-const void * icon_low_beam = NULL;
-extern const void * icon_low_beam_data;
-const void * icon_high_beam = NULL;
-extern const void * icon_high_beam_data;
-const void * icon_brake = NULL;
-extern const void * icon_brake_data;
-const void * icon_warning = NULL;
-extern const void * icon_warning_data;
-const void * icon_hazard = NULL;
-extern const void * icon_hazard_data;
-const void * icon_battery = NULL;
-extern const void * icon_battery_data;
-const void * icon_thermometer = NULL;
-extern const void * icon_thermometer_data;
+const void * ui_img_background = NULL;
+extern const void * ui_img_background_data;
+const void * ui_img_left = NULL;
+extern const void * ui_img_left_data;
+const void * ui_img_right = NULL;
+extern const void * ui_img_right_data;
+const void * ui_img_position = NULL;
+extern const void * ui_img_position_data;
+const void * ui_img_low_beam = NULL;
+extern const void * ui_img_low_beam_data;
+const void * ui_img_high_beam = NULL;
+extern const void * ui_img_high_beam_data;
+const void * ui_img_brake = NULL;
+extern const void * ui_img_brake_data;
+const void * ui_img_warning = NULL;
+extern const void * ui_img_warning_data;
+const void * ui_img_hazard = NULL;
+extern const void * ui_img_hazard_data;
+const void * ui_img_battery = NULL;
+extern const void * ui_img_battery_data;
+const void * ui_img_thermometer = NULL;
+extern const void * ui_img_thermometer_data;
+const void * ui_img_switch_track = NULL;
+extern const void * ui_img_switch_track_data;
+const void * ui_img_switch_knob = NULL;
+extern const void * ui_img_switch_knob_data;
 
 /*----------------
  * Global styles
@@ -102,7 +104,7 @@ lv_style_t card;
 lv_style_t button;
 lv_style_t selected;
 lv_style_t limit_selected;
-lv_style_t battery_fill;
+lv_style_t battery_fill_style;
 lv_style_t arc_indicator;
 lv_style_t arc_knob;
 lv_style_t minor_ticks;
@@ -110,21 +112,32 @@ lv_style_t major_ticks;
 lv_style_t dot_selected_0;
 lv_style_t dot_selected_1;
 lv_style_t dot_selected_2;
+lv_style_t clear;
+lv_style_t switch_track;
+lv_style_t switch_indicator;
+lv_style_t switch_on;
+lv_style_t switch_knob;
 
 /*----------------
  * Subjects
  *----------------*/
 
-lv_subject_t demo_speed;
-lv_subject_t demo_battery;
-lv_subject_t demo_mode;
-lv_subject_t demo_limit;
-lv_subject_t demo_meter;
-lv_subject_t demo_hazard;
-lv_subject_t demo_blink_on;
-lv_subject_t demo_blink_off;
-lv_subject_t demo_hold;
-lv_subject_t demo_double;
+lv_subject_t ui_speed_value;
+lv_subject_t ui_battery;
+lv_subject_t ui_mode;
+lv_subject_t ui_limit;
+lv_subject_t ui_meter;
+lv_subject_t ui_hazard;
+lv_subject_t ui_blink_on;
+lv_subject_t ui_blink_off;
+lv_subject_t ui_hold;
+lv_subject_t ui_double;
+lv_subject_t ui_flip;
+lv_subject_t ui_motion;
+lv_subject_t ui_cruise;
+lv_subject_t ui_safe;
+lv_subject_t ui_mode_text;
+lv_subject_t ui_notice;
 
 /**********************
  *      MACROS
@@ -190,49 +203,57 @@ void ebike_display_init_gen(const char * asset_path)
     /* Targets: any */
     #if EBIKE_DISPLAY_CHECK_COMPILE_TARGET(EBIKE_DISPLAY_TARGET_ALL)
     if (ebike_display_check_target(EBIKE_DISPLAY_TARGET_ALL)) {
-        /* dashboard_background */
-        if (!dashboard_background) {
-            dashboard_background = &dashboard_background_data;
+        /* ui_img_background */
+        if (!ui_img_background) {
+            ui_img_background = &ui_img_background_data;
         }
-        /* icon_left */
-        if (!icon_left) {
-            icon_left = &icon_left_data;
+        /* ui_img_left */
+        if (!ui_img_left) {
+            ui_img_left = &ui_img_left_data;
         }
-        /* icon_right */
-        if (!icon_right) {
-            icon_right = &icon_right_data;
+        /* ui_img_right */
+        if (!ui_img_right) {
+            ui_img_right = &ui_img_right_data;
         }
-        /* icon_position */
-        if (!icon_position) {
-            icon_position = &icon_position_data;
+        /* ui_img_position */
+        if (!ui_img_position) {
+            ui_img_position = &ui_img_position_data;
         }
-        /* icon_low_beam */
-        if (!icon_low_beam) {
-            icon_low_beam = &icon_low_beam_data;
+        /* ui_img_low_beam */
+        if (!ui_img_low_beam) {
+            ui_img_low_beam = &ui_img_low_beam_data;
         }
-        /* icon_high_beam */
-        if (!icon_high_beam) {
-            icon_high_beam = &icon_high_beam_data;
+        /* ui_img_high_beam */
+        if (!ui_img_high_beam) {
+            ui_img_high_beam = &ui_img_high_beam_data;
         }
-        /* icon_brake */
-        if (!icon_brake) {
-            icon_brake = &icon_brake_data;
+        /* ui_img_brake */
+        if (!ui_img_brake) {
+            ui_img_brake = &ui_img_brake_data;
         }
-        /* icon_warning */
-        if (!icon_warning) {
-            icon_warning = &icon_warning_data;
+        /* ui_img_warning */
+        if (!ui_img_warning) {
+            ui_img_warning = &ui_img_warning_data;
         }
-        /* icon_hazard */
-        if (!icon_hazard) {
-            icon_hazard = &icon_hazard_data;
+        /* ui_img_hazard */
+        if (!ui_img_hazard) {
+            ui_img_hazard = &ui_img_hazard_data;
         }
-        /* icon_battery */
-        if (!icon_battery) {
-            icon_battery = &icon_battery_data;
+        /* ui_img_battery */
+        if (!ui_img_battery) {
+            ui_img_battery = &ui_img_battery_data;
         }
-        /* icon_thermometer */
-        if (!icon_thermometer) {
-            icon_thermometer = &icon_thermometer_data;
+        /* ui_img_thermometer */
+        if (!ui_img_thermometer) {
+            ui_img_thermometer = &ui_img_thermometer_data;
+        }
+        /* ui_img_switch_track */
+        if (!ui_img_switch_track) {
+            ui_img_switch_track = &ui_img_switch_track_data;
+        }
+        /* ui_img_switch_knob */
+        if (!ui_img_switch_knob) {
+            ui_img_switch_knob = &ui_img_switch_knob_data;
         }
     }
     #endif
@@ -249,7 +270,7 @@ void ebike_display_init_gen(const char * asset_path)
         lv_style_init(&button);
         lv_style_init(&selected);
         lv_style_init(&limit_selected);
-        lv_style_init(&battery_fill);
+        lv_style_init(&battery_fill_style);
         lv_style_init(&arc_indicator);
         lv_style_init(&arc_knob);
         lv_style_init(&minor_ticks);
@@ -257,6 +278,11 @@ void ebike_display_init_gen(const char * asset_path)
         lv_style_init(&dot_selected_0);
         lv_style_init(&dot_selected_1);
         lv_style_init(&dot_selected_2);
+        lv_style_init(&clear);
+        lv_style_init(&switch_track);
+        lv_style_init(&switch_indicator);
+        lv_style_init(&switch_on);
+        lv_style_init(&switch_knob);
 
         lv_style_set_bg_color(&card, COLOR_BG);
         lv_style_set_bg_opa(&card, (255 * 92 / 100));
@@ -279,7 +305,7 @@ void ebike_display_init_gen(const char * asset_path)
         lv_style_set_bg_color(&limit_selected, lv_color_hex(0x491b20));
         lv_style_set_border_color(&limit_selected, COLOR_RED);
         lv_style_set_border_width(&limit_selected, 2);
-        lv_style_set_bg_color(&battery_fill, lv_color_hex(0x31f29a));
+        lv_style_set_bg_color(&battery_fill_style, lv_color_hex(0x31f29a));
         lv_style_set_arc_color(&arc_indicator, COLOR_RED);
         lv_style_set_arc_width(&arc_indicator, 8);
         lv_style_set_bg_opa(&arc_knob, (255 * 0 / 100));
@@ -300,6 +326,31 @@ void ebike_display_init_gen(const char * asset_path)
         lv_style_set_width(&dot_selected_1, 16);
         lv_style_set_bg_color(&dot_selected_2, COLOR_CYAN);
         lv_style_set_width(&dot_selected_2, 16);
+        lv_style_set_bg_opa(&clear, (255 * 0 / 100));
+        lv_style_set_border_width(&clear, 0);
+        lv_style_set_pad_all(&clear, 0);
+        lv_style_set_shadow_width(&clear, 0);
+        lv_style_set_radius(&clear, 0);
+        lv_style_set_radius(&switch_track, 100);
+        lv_style_set_bg_opa(&switch_track, (255 * 0 / 100));
+        lv_style_set_border_width(&switch_track, 0);
+        lv_style_set_pad_all(&switch_track, 0);
+        lv_style_set_shadow_width(&switch_track, 0);
+        lv_style_set_bg_image_src(&switch_track, ui_img_switch_track);
+        lv_style_set_bg_image_recolor(&switch_track, lv_color_hex(0x243c4d));
+        lv_style_set_bg_image_recolor_opa(&switch_track, (255 * 100 / 100));
+        lv_style_set_radius(&switch_indicator, 100);
+        lv_style_set_bg_opa(&switch_indicator, (255 * 0 / 100));
+        lv_style_set_border_width(&switch_indicator, 0);
+        lv_style_set_bg_image_recolor(&switch_on, COLOR_CYAN);
+        lv_style_set_radius(&switch_knob, 100);
+        lv_style_set_bg_opa(&switch_knob, (255 * 0 / 100));
+        lv_style_set_border_width(&switch_knob, 0);
+        lv_style_set_pad_all(&switch_knob, -4);
+        lv_style_set_shadow_width(&switch_knob, 0);
+        lv_style_set_bg_image_src(&switch_knob, ui_img_switch_knob);
+        lv_style_set_bg_image_recolor(&switch_knob, COLOR_TEXT);
+        lv_style_set_bg_image_recolor_opa(&switch_knob, (255 * 100 / 100));
 
         style_inited = true;
     }
@@ -307,16 +358,36 @@ void ebike_display_init_gen(const char * asset_path)
     /*----------------
      * Subjects
      *----------------*/
-    lv_subject_init_int(&demo_speed, 42);
-    lv_subject_init_int(&demo_battery, 82);
-    lv_subject_init_int(&demo_mode, 1);
-    lv_subject_init_int(&demo_limit, 50);
-    lv_subject_init_int(&demo_meter, 0);
-    lv_subject_init_int(&demo_hazard, 0);
-    lv_subject_init_int(&demo_blink_on, 450);
-    lv_subject_init_int(&demo_blink_off, 450);
-    lv_subject_init_int(&demo_hold, 2000);
-    lv_subject_init_int(&demo_double, 300);
+    lv_subject_init_int(&ui_speed_value, 42);
+    lv_subject_init_int(&ui_battery, 82);
+    lv_subject_init_int(&ui_mode, 1);
+    lv_subject_init_int(&ui_limit, 50);
+    lv_subject_init_int(&ui_meter, 0);
+    lv_subject_init_int(&ui_hazard, 0);
+    lv_subject_init_int(&ui_blink_on, 450);
+    lv_subject_init_int(&ui_blink_off, 450);
+    lv_subject_init_int(&ui_hold, 2000);
+    lv_subject_init_int(&ui_double, 300);
+    lv_subject_init_int(&ui_flip, 0);
+    lv_subject_init_int(&ui_motion, 0);
+    lv_subject_init_int(&ui_cruise, 0);
+    lv_subject_init_int(&ui_safe, 1);
+    static char ui_mode_text_buf[UI_SUBJECT_STRING_LENGTH];
+    static char ui_mode_text_prev_buf[UI_SUBJECT_STRING_LENGTH];
+    lv_subject_init_string(&ui_mode_text,
+                           ui_mode_text_buf,
+                           ui_mode_text_prev_buf,
+                           UI_SUBJECT_STRING_LENGTH,
+                           "Drive"
+                          );
+    static char ui_notice_buf[UI_SUBJECT_STRING_LENGTH];
+    static char ui_notice_prev_buf[UI_SUBJECT_STRING_LENGTH];
+    lv_subject_init_string(&ui_notice,
+                           ui_notice_buf,
+                           ui_notice_prev_buf,
+                           UI_SUBJECT_STRING_LENGTH,
+                           "ПРЕДПРОСМОТР · тестовые показания"
+                          );
 
     /*----------------
      * Translations
@@ -344,16 +415,22 @@ void ebike_display_init_gen(const char * asset_path)
     lv_xml_register_font(NULL, "ui_speed", ui_speed);
 
     /* Register subjects */
-    lv_xml_register_subject(NULL, "demo_speed", &demo_speed);
-    lv_xml_register_subject(NULL, "demo_battery", &demo_battery);
-    lv_xml_register_subject(NULL, "demo_mode", &demo_mode);
-    lv_xml_register_subject(NULL, "demo_limit", &demo_limit);
-    lv_xml_register_subject(NULL, "demo_meter", &demo_meter);
-    lv_xml_register_subject(NULL, "demo_hazard", &demo_hazard);
-    lv_xml_register_subject(NULL, "demo_blink_on", &demo_blink_on);
-    lv_xml_register_subject(NULL, "demo_blink_off", &demo_blink_off);
-    lv_xml_register_subject(NULL, "demo_hold", &demo_hold);
-    lv_xml_register_subject(NULL, "demo_double", &demo_double);
+    lv_xml_register_subject(NULL, "ui_speed_value", &ui_speed_value);
+    lv_xml_register_subject(NULL, "ui_battery", &ui_battery);
+    lv_xml_register_subject(NULL, "ui_mode", &ui_mode);
+    lv_xml_register_subject(NULL, "ui_limit", &ui_limit);
+    lv_xml_register_subject(NULL, "ui_meter", &ui_meter);
+    lv_xml_register_subject(NULL, "ui_hazard", &ui_hazard);
+    lv_xml_register_subject(NULL, "ui_blink_on", &ui_blink_on);
+    lv_xml_register_subject(NULL, "ui_blink_off", &ui_blink_off);
+    lv_xml_register_subject(NULL, "ui_hold", &ui_hold);
+    lv_xml_register_subject(NULL, "ui_double", &ui_double);
+    lv_xml_register_subject(NULL, "ui_flip", &ui_flip);
+    lv_xml_register_subject(NULL, "ui_motion", &ui_motion);
+    lv_xml_register_subject(NULL, "ui_cruise", &ui_cruise);
+    lv_xml_register_subject(NULL, "ui_safe", &ui_safe);
+    lv_xml_register_subject(NULL, "ui_mode_text", &ui_mode_text);
+    lv_xml_register_subject(NULL, "ui_notice", &ui_notice);
 
     /* Register callbacks */
 #endif
@@ -362,17 +439,19 @@ void ebike_display_init_gen(const char * asset_path)
      * While running in the editor skip this step to update the preview when the XML changes */
 #if defined(LV_USE_XML) && LV_USE_XML && !defined(LV_EDITOR_PREVIEW)
     /* Register images */
-    lv_xml_register_image(NULL, "dashboard_background", dashboard_background);
-    lv_xml_register_image(NULL, "icon_left", icon_left);
-    lv_xml_register_image(NULL, "icon_right", icon_right);
-    lv_xml_register_image(NULL, "icon_position", icon_position);
-    lv_xml_register_image(NULL, "icon_low_beam", icon_low_beam);
-    lv_xml_register_image(NULL, "icon_high_beam", icon_high_beam);
-    lv_xml_register_image(NULL, "icon_brake", icon_brake);
-    lv_xml_register_image(NULL, "icon_warning", icon_warning);
-    lv_xml_register_image(NULL, "icon_hazard", icon_hazard);
-    lv_xml_register_image(NULL, "icon_battery", icon_battery);
-    lv_xml_register_image(NULL, "icon_thermometer", icon_thermometer);
+    lv_xml_register_image(NULL, "ui_img_background", ui_img_background);
+    lv_xml_register_image(NULL, "ui_img_left", ui_img_left);
+    lv_xml_register_image(NULL, "ui_img_right", ui_img_right);
+    lv_xml_register_image(NULL, "ui_img_position", ui_img_position);
+    lv_xml_register_image(NULL, "ui_img_low_beam", ui_img_low_beam);
+    lv_xml_register_image(NULL, "ui_img_high_beam", ui_img_high_beam);
+    lv_xml_register_image(NULL, "ui_img_brake", ui_img_brake);
+    lv_xml_register_image(NULL, "ui_img_warning", ui_img_warning);
+    lv_xml_register_image(NULL, "ui_img_hazard", ui_img_hazard);
+    lv_xml_register_image(NULL, "ui_img_battery", ui_img_battery);
+    lv_xml_register_image(NULL, "ui_img_thermometer", ui_img_thermometer);
+    lv_xml_register_image(NULL, "ui_img_switch_track", ui_img_switch_track);
+    lv_xml_register_image(NULL, "ui_img_switch_knob", ui_img_switch_knob);
 #endif
 
 #if !defined(LV_USE_XML) || LV_USE_XML == 0

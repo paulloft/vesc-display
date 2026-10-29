@@ -1,0 +1,6 @@
+<component>
+    <view extends="lv_obj" width="480" height="320" scrollable="true" style_text_font="ui_small" style_bg_opa="100%" style_bg_color="#color_bg">
+        <style name="clear" />
+        <lv_label name="diagnostics_text" text="VESC: нет подключения в редакторе&#10;SD: демонстрация&#10;Плата I/O: демонстрация&#10;Безопасный режим: вкл&#10;UART: 115200 бод&#10;Пульт и нагрузки: данные поступят от ESP32" x="12" y="32" width="456" style_text_font="ui_small" style_text_color="#color_text" clickable="false" />
+    </view>
+</component>

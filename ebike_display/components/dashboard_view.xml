@@ -1,0 +1,811 @@
+<component>
+	<view extends="lv_obj" width="480" height="320" scrollable="false" style_text_font="ui_small">
+		<style name="clear" />
+		<lv_image
+			name="background"
+			src="ui_img_background"
+			x="0"
+			y="0"
+			width="480"
+			height="320"
+			inner_align="stretch"
+			clickable="false"
+		/>
+		<lv_image
+			name="status_left"
+			src="ui_img_left"
+			x="6"
+			y="3"
+			clickable="false"
+			style_image_recolor="0x354b5a"
+			style_image_recolor_opa="100%"
+		/>
+		<lv_image
+			name="status_position"
+			src="ui_img_position"
+			x="78"
+			y="3"
+			clickable="false"
+			style_image_recolor="0x31f29a"
+			style_image_recolor_opa="100%"
+		/>
+		<lv_image
+			name="status_low_beam"
+			src="ui_img_low_beam"
+			x="150"
+			y="3"
+			clickable="false"
+			style_image_recolor="0xe3f3ff"
+			style_image_recolor_opa="100%"
+		/>
+		<lv_image
+			name="status_high_beam"
+			src="ui_img_high_beam"
+			x="222"
+			y="3"
+			clickable="false"
+			style_image_recolor="0x354b5a"
+			style_image_recolor_opa="100%"
+		/>
+		<lv_image
+			name="status_brake"
+			src="ui_img_brake"
+			x="294"
+			y="3"
+			clickable="false"
+			style_image_recolor="0x354b5a"
+			style_image_recolor_opa="100%"
+		/>
+		<lv_image
+			name="status_warning"
+			src="ui_img_warning"
+			x="366"
+			y="3"
+			clickable="true"
+			style_image_recolor="0x354b5a"
+			style_image_recolor_opa="100%"
+		>
+			<screen_create_event screen="diagnostics" />
+		</lv_image>
+		<lv_image
+			name="status_right"
+			src="ui_img_right"
+			x="438"
+			y="3"
+			clickable="false"
+			style_image_recolor="0x354b5a"
+			style_image_recolor_opa="100%"
+		/>
+		<lv_obj name="temperatures" x="8" y="123" width="112" height="100" scrollable="false">
+			<style name="card" />
+			<lv_label
+				name="motor_caption"
+				text="МОТОР"
+				x="37"
+				y="4"
+				width="75"
+				style_text_font="ui_small"
+				style_text_color="#color_text"
+				clickable="false"
+			/>
+			<lv_label
+				name="motor_value"
+				text="48°C"
+				x="37"
+				y="20"
+				width="75"
+				style_text_font="ui_medium"
+				style_text_color="#color_text"
+				clickable="false"
+			/>
+			<lv_image
+				name="motor_icon"
+				src="ui_img_thermometer"
+				x="8"
+				y="7"
+				clickable="false"
+				style_image_recolor="0xff9c60"
+				style_image_recolor_opa="100%"
+			/>
+			<lv_label
+				name="controller_caption"
+				text="КОНТР."
+				x="37"
+				y="53"
+				width="75"
+				style_text_font="ui_small"
+				style_text_color="#color_text"
+				clickable="false"
+			/>
+			<lv_label
+				name="controller_value"
+				text="38°C"
+				x="37"
+				y="69"
+				width="75"
+				style_text_font="ui_medium"
+				style_text_color="#color_text"
+				clickable="false"
+			/>
+			<lv_image
+				name="controller_icon"
+				src="ui_img_thermometer"
+				x="8"
+				y="56"
+				clickable="false"
+				style_image_recolor="0xff9c60"
+				style_image_recolor_opa="100%"
+			/>
+		</lv_obj>
+		<lv_arc
+			name="speed_arc"
+			x="125"
+			y="35"
+			width="221"
+			height="221"
+			rotation="150"
+			bg_start_angle="0"
+			bg_end_angle="240"
+			min_value="0"
+			max_value="100"
+			bind_value="ui_speed_value"
+			clickable="false"
+			style_pad_all="4"
+			style_arc_color="0x233f51"
+			style_arc_width="8"
+		>
+			<style name="arc_indicator" selector="indicator" />
+			<style name="arc_knob" selector="knob" />
+		</lv_arc>
+		<lv_scale
+			name="speed_ticks"
+			x="125"
+			y="35"
+			width="221"
+			height="221"
+			mode="round_inner"
+			total_tick_count="51"
+			major_tick_every="10"
+			min_value="0"
+			max_value="100"
+			angle_range="240"
+			rotation="150"
+			label_show="true"
+			style_pad_all="14"
+			style_arc_opa="0%"
+			style_line_width="0"
+			clickable="false"
+		>
+			<style name="minor_ticks" selector="items" />
+			<style name="major_ticks" selector="indicator" />
+		</lv_scale>
+		<lv_label
+			name="speed_value"
+			text="42"
+			x="142"
+			y="80"
+			width="186"
+			style_text_font="ui_speed"
+			style_text_color="#color_text"
+			clickable="false"
+			style_text_align="center"
+			bind_text="ui_speed_value"
+		/>
+		<lv_label
+			name="speed_units"
+			text="КМ/Ч"
+			x="176"
+			y="165"
+			width="120"
+			style_text_font="ui_small"
+			style_text_color="#color_text"
+			clickable="false"
+			style_text_align="center"
+		/>
+		<lv_obj
+			name="current_mode"
+			x="184"
+			y="202"
+			width="104"
+			height="29"
+			scrollable="false"
+			style_border_color="#color_cyan"
+			style_border_width="2"
+		>
+			<style name="card" />
+			<lv_label
+				name="mode_badge"
+				text="Drive"
+				x="0"
+				y="0"
+				width="content"
+				style_text_font="ui_medium"
+				style_text_color="#color_text"
+				clickable="false"
+				align="center"
+				bind_text="ui_mode_text"
+			/>
+		</lv_obj>
+		<lv_button name="hazard" x="351" y="145" width="121" height="78" scrollable="false" style_border_width="2">
+			<style name="button" />
+			<lv_label
+				name="hazard_text"
+				text=""
+				x="0"
+				y="0"
+				width="content"
+				style_text_font="ui_medium"
+				style_text_color="#color_text"
+				clickable="false"
+				align="center"
+				style_text_align="center"
+			/>
+			<lv_image
+				name="hazard_icon"
+				src="ui_img_hazard"
+				x="0"
+				y="0"
+				clickable="false"
+				style_image_recolor="0xd1aa76"
+				style_image_recolor_opa="100%"
+				align="center"
+			/>
+			<subject_toggle_event subject="ui_hazard" />
+			<bind_state_if_eq subject="ui_hazard" state="checked" ref_value="1" />
+			<style name="limit_selected" selector="checked" />
+		</lv_button>
+		<lv_obj name="footer" x="4" y="250" width="472" height="70" scrollable="false">
+			<style name="card" />
+		</lv_obj>
+		<lv_button name="select_N" x="8" y="254" width="52" height="62" scrollable="false">
+			<style name="button" />
+			<lv_label
+				name="select_N_text"
+				text="N"
+				x="0"
+				y="0"
+				width="content"
+				style_text_font="ui_medium"
+				style_text_color="#color_text"
+				clickable="false"
+				align="center"
+				style_text_align="center"
+			/>
+			<style name="selected" selector="checked" />
+			<bind_state_if_eq subject="ui_mode" state="checked" ref_value="0" />
+			<subject_set_int_event subject="ui_mode" value="0" />
+			<subject_set_string_event subject="ui_mode_text" value="N" />
+		</lv_button>
+		<lv_button name="select_Drive" x="66" y="254" width="72" height="62" scrollable="false">
+			<style name="button" />
+			<lv_label
+				name="select_Drive_text"
+				text="Drive"
+				x="0"
+				y="0"
+				width="content"
+				style_text_font="ui_medium"
+				style_text_color="#color_text"
+				clickable="false"
+				align="center"
+				style_text_align="center"
+			/>
+			<style name="selected" selector="checked" />
+			<bind_state_if_eq subject="ui_mode" state="checked" ref_value="1" />
+			<subject_set_int_event subject="ui_mode" value="1" />
+			<subject_set_string_event subject="ui_mode_text" value="Drive" />
+		</lv_button>
+		<lv_button name="select_Sport" x="144" y="254" width="72" height="62" scrollable="false">
+			<style name="button" />
+			<lv_label
+				name="select_Sport_text"
+				text="Sport"
+				x="0"
+				y="0"
+				width="content"
+				style_text_font="ui_medium"
+				style_text_color="#color_text"
+				clickable="false"
+				align="center"
+				style_text_align="center"
+			/>
+			<style name="selected" selector="checked" />
+			<bind_state_if_eq subject="ui_mode" state="checked" ref_value="2" />
+			<subject_set_int_event subject="ui_mode" value="2" />
+			<subject_set_string_event subject="ui_mode_text" value="Sport" />
+		</lv_button>
+		<lv_obj
+			name="footer_separator"
+			x="225"
+			y="257"
+			width="1"
+			height="56"
+			style_bg_color="0x447b98"
+			style_bg_opa="100%"
+			style_border_width="0"
+			style_pad_all="0"
+			scrollable="false"
+		/>
+		<lv_obj name="limit_buttons" x="235" y="254" width="237" height="62" scrollable="false"
+			style_layout="flex" style_flex_flow="row" style_pad_column="6">
+			<style name="clear" />
+		<lv_button name="limit_25" width="0" height="100%" flex_grow="1" scrollable="false">
+			<style name="button" />
+			<lv_label
+				name="limit_25_text"
+				text="25"
+				x="0"
+				y="0"
+				width="content"
+				style_text_font="ui_medium"
+				style_text_color="#color_text"
+				clickable="false"
+				align="center"
+				style_text_align="center"
+			/>
+			<style name="limit_selected" selector="checked" />
+			<bind_state_if_eq subject="ui_limit" state="checked" ref_value="25" />
+			<subject_set_int_event subject="ui_limit" value="25" />
+		</lv_button>
+		<lv_button name="limit_50" width="0" height="100%" flex_grow="1" scrollable="false">
+			<style name="button" />
+			<lv_label
+				name="limit_50_text"
+				text="50"
+				x="0"
+				y="0"
+				width="content"
+				style_text_font="ui_medium"
+				style_text_color="#color_text"
+				clickable="false"
+				align="center"
+				style_text_align="center"
+			/>
+			<style name="limit_selected" selector="checked" />
+			<bind_state_if_eq subject="ui_limit" state="checked" ref_value="50" />
+			<subject_set_int_event subject="ui_limit" value="50" />
+		</lv_button>
+		<lv_button name="limit_70" width="0" height="100%" flex_grow="1" scrollable="false">
+			<style name="button" />
+			<lv_label
+				name="limit_70_text"
+				text="70"
+				x="1"
+				y="0"
+				width="content"
+				style_text_font="ui_medium"
+				style_text_color="#color_text"
+				clickable="false"
+				align="center"
+				style_text_align="center"
+			/>
+			<style name="limit_selected" selector="checked" />
+			<bind_state_if_eq subject="ui_limit" state="checked" ref_value="70" />
+			<subject_set_int_event subject="ui_limit" value="70" />
+		</lv_button>
+		<lv_button name="limit_0" width="0" height="100%" flex_grow="1" scrollable="false">
+			<style name="button" />
+			<lv_label
+				name="limit_0_text"
+				text="MAX"
+				x="0"
+				y="0"
+				width="content"
+				style_text_font="ui_medium"
+				style_text_color="#color_text"
+				clickable="false"
+				align="center"
+				style_text_align="center"
+			/>
+			<style name="limit_selected" selector="checked" />
+			<bind_state_if_eq subject="ui_limit" state="checked" ref_value="0" />
+			<subject_set_int_event subject="ui_limit" value="0" />
+		</lv_button>
+		</lv_obj>
+		<lv_obj name="battery_card" x="8" y="35" width="112" height="79" scrollable="false" style_clip_corner="true">
+			<style name="card" />
+			<lv_tabview
+				name="battery_pages"
+				x="0"
+				y="0"
+				width="100%"
+				height="100%"
+				tab_bar_position="bottom"
+				style_radius="10"
+				style_clip_corner="true"
+				scroll_elastic="false"
+				gesture_bubble="false"
+			>
+				<style name="clear" />
+				<lv_tabview-tab_bar
+					name="battery_dots"
+					height="10"
+					style_pad_all="0"
+					style_bg_opa="0%"
+					style_border_width="0"
+					style_flex_main_place="center"
+					style_flex_cross_place="center"
+					style_pad_column="12"
+					width="100%"
+				/>
+				<lv_tabview-tab
+					name="battery_page_0"
+					text=""
+					scrollable="false"
+					gesture_bubble="false"
+					style_bg_opa="100%"
+					style_bg_color="#color_bg"
+				>
+					<style name="clear" />
+					<lv_label
+						name="battery_title"
+						text="ЗАРЯД"
+						x="36"
+						y="5"
+						width="70"
+						style_text_font="ui_small"
+						style_text_color="#color_text"
+						clickable="false"
+					 style_text_align="center" />
+					<lv_label
+						name="battery_value_0"
+						text="82%"
+						x="36"
+						y="19"
+						width="70"
+						style_text_font="ui_value"
+						style_text_color="#color_text"
+						clickable="false"
+					 style_text_align="center" />
+					<lv_bar
+						name="battery_fill"
+						x="14"
+						y="21"
+						width="14"
+						height="33"
+						min_value="0"
+						max_value="100"
+						bind_value="ui_battery"
+						style_bg_color="0x152a38"
+					>
+						<style name="battery_fill_style" selector="indicator" />
+					</lv_bar>
+					<lv_image
+						name="battery_frame"
+						src="ui_img_battery"
+						x="7"
+						y="12"
+						clickable="false"
+						style_image_recolor="0xbdd9e8"
+						style_image_recolor_opa="100%"
+					/>
+				</lv_tabview-tab>
+				<lv_tabview-tab
+					name="battery_page_1"
+					text=""
+					scrollable="false"
+					gesture_bubble="false"
+					style_bg_opa="100%"
+					style_bg_color="#color_bg"
+				>
+					<style name="clear" />
+					<lv_label
+						name="battery_title_1"
+						text="НАПРЯЖЕНИЕ"
+						x="0"
+						y="2"
+						width="100%"
+						style_text_font="ui_small"
+						style_text_color="#color_text"
+						clickable="false"
+						style_text_align="center"
+					/>
+					<lv_label
+						name="battery_value_1"
+						text="72.0"
+						x="0"
+						y="13"
+						width="100%"
+						style_text_font="ui_value"
+						style_text_color="#color_text"
+						clickable="false"
+						style_text_align="center"
+						height="44"
+					/>
+					<lv_label name="battery_units_1" text="В" x="0" y="49"
+						width="100%" style_text_font="ui_small" style_text_color="#color_text"
+						clickable="false" style_text_align="center" />
+				</lv_tabview-tab>
+				<lv_tabview-tab
+					name="battery_page_2"
+					text=""
+					scrollable="false"
+					gesture_bubble="false"
+					style_bg_opa="100%"
+					style_bg_color="#color_bg"
+				>
+					<style name="clear" />
+					<lv_label
+						name="battery_title_2"
+						text="МОЩНОСТЬ"
+						x="0"
+						y="2"
+						width="100%"
+						style_text_font="ui_small"
+						style_text_color="#color_text"
+						clickable="false"
+						style_text_align="center"
+					/>
+					<lv_label
+						name="battery_value_2"
+						text="590"
+						x="0"
+						y="13"
+						width="100%"
+						style_text_font="ui_value"
+						style_text_color="#color_text"
+						clickable="false"
+						style_text_align="center"
+						height="44"
+					/>
+					<lv_label name="battery_units_2" text="Вт" x="0" y="49"
+						width="100%" style_text_font="ui_small" style_text_color="#color_text"
+						clickable="false" style_text_align="center" />
+				</lv_tabview-tab>
+				<lv_tabview-tab_button
+					name="battery_dot_0"
+					index="0"
+					width="5"
+					height="5"
+					flex_grow="0"
+					ext_click_area="8"
+					style_bg_color="0x375469"
+					style_bg_opa="100%"
+					style_radius="100"
+					style_border_width="0"
+					style_pad_all="0"
+					style_shadow_width="0"
+					style_bg_color-checked="#color_cyan"
+					style_width-checked="16"
+				/>
+				<lv_tabview-tab_button
+					name="battery_dot_1"
+					index="1"
+					width="5"
+					height="5"
+					flex_grow="0"
+					ext_click_area="8"
+					style_bg_color="0x375469"
+					style_bg_opa="100%"
+					style_radius="100"
+					style_border_width="0"
+					style_pad_all="0"
+					style_shadow_width="0"
+					style_bg_color-checked="#color_cyan"
+					style_width-checked="16"
+				/>
+				<lv_tabview-tab_button
+					name="battery_dot_2"
+					index="2"
+					width="5"
+					height="5"
+					flex_grow="0"
+					ext_click_area="8"
+					style_bg_color="0x375469"
+					style_bg_opa="100%"
+					style_radius="100"
+					style_border_width="0"
+					style_pad_all="0"
+					style_shadow_width="0"
+					style_bg_color-checked="#color_cyan"
+					style_width-checked="16"
+				/>
+			</lv_tabview>
+		</lv_obj>
+		<lv_obj name="trip_card" x="351" y="35" width="121" height="102" scrollable="false" style_clip_corner="true">
+			<style name="card" />
+			<lv_tabview
+				name="trip_pages"
+				x="0"
+				y="0"
+				width="100%"
+				height="100%"
+				tab_bar_position="bottom"
+				style_radius="10"
+				style_clip_corner="true"
+				scroll_elastic="false"
+				gesture_bubble="false"
+			>
+				<style name="clear" />
+				<lv_tabview-tab_bar
+					name="trip_dots"
+					height="10"
+					style_pad_all="0"
+					style_bg_opa="0%"
+					style_border_width="0"
+					style_flex_main_place="center"
+					style_flex_cross_place="center"
+					style_pad_column="12"
+					width="119"
+				/>
+				<lv_tabview-tab
+					name="trip_page_0"
+					text=""
+					scrollable="false"
+					gesture_bubble="false"
+					style_bg_opa="100%"
+					style_bg_color="#color_bg"
+				>
+					<style name="clear" />
+					<lv_label
+						name="trip_title_0"
+						text="ПОЕЗДКА"
+						x="0"
+						y="5"
+						width="119"
+						style_text_font="ui_small"
+						style_text_color="#color_text"
+						clickable="false"
+						style_text_align="center"
+					/>
+					<lv_label
+						name="trip_value_0"
+						text="24.8"
+						x="0"
+						y="28"
+						width="119"
+						style_text_font="ui_value"
+						style_text_color="#color_text"
+						clickable="false"
+						style_text_align="center"
+					/>
+					<lv_label
+						name="trip_units_0"
+						text="КМ"
+						x="0"
+						y="65"
+						width="119"
+						style_text_font="ui_small"
+						style_text_color="#color_text"
+						clickable="false"
+						style_text_align="center"
+					/>
+				</lv_tabview-tab>
+				<lv_tabview-tab
+					name="trip_page_1"
+					text=""
+					scrollable="false"
+					gesture_bubble="false"
+					style_bg_opa="100%"
+					style_bg_color="#color_bg"
+				>
+					<style name="clear" />
+					<lv_label
+						name="trip_title_1"
+						text="ОБЩИЙ"
+						x="0"
+						y="5"
+						width="119"
+						style_text_font="ui_small"
+						style_text_color="#color_text"
+						clickable="false"
+						style_text_align="center"
+					/>
+					<lv_label
+						name="trip_value_1"
+						text="1524.7"
+						x="0"
+						y="28"
+						width="119"
+						style_text_font="ui_value"
+						style_text_color="#color_text"
+						clickable="false"
+						style_text_align="center"
+					/>
+					<lv_label
+						name="trip_units_1"
+						text="КМ"
+						x="0"
+						y="65"
+						width="119"
+						style_text_font="ui_small"
+						style_text_color="#color_text"
+						clickable="false"
+						style_text_align="center"
+					/>
+				</lv_tabview-tab>
+				<lv_tabview-tab
+					name="trip_page_2"
+					text=""
+					scrollable="false"
+					gesture_bubble="false"
+					style_bg_opa="100%"
+					style_bg_color="#color_bg"
+				>
+					<style name="clear" />
+					<lv_label
+						name="trip_title_2"
+						text="ВРЕМЯ"
+						x="0"
+						y="5"
+						width="119"
+						style_text_font="ui_small"
+						style_text_color="#color_text"
+						clickable="false"
+						style_text_align="center"
+					/>
+					<lv_label
+						name="trip_value_2"
+						text="01:23"
+						x="0"
+						y="28"
+						width="119"
+						style_text_font="ui_value"
+						style_text_color="#color_text"
+						clickable="false"
+						style_text_align="center"
+					/>
+					<lv_label
+						name="trip_units_2"
+						text="ЧАС : МИН"
+						x="0"
+						y="65"
+						width="119"
+						style_text_font="ui_small"
+						style_text_color="#color_text"
+						clickable="false"
+						style_text_align="center"
+					/>
+				</lv_tabview-tab>
+				<lv_tabview-tab_button
+					name="trip_dot_0"
+					index="0"
+					width="5"
+					height="5"
+					flex_grow="0"
+					ext_click_area="8"
+					style_bg_color="0x375469"
+					style_bg_opa="100%"
+					style_radius="100"
+					style_border_width="0"
+					style_pad_all="0"
+					style_shadow_width="0"
+					style_bg_color-checked="#color_cyan"
+					style_width-checked="16"
+				/>
+				<lv_tabview-tab_button
+					name="trip_dot_1"
+					index="1"
+					width="5"
+					height="5"
+					flex_grow="0"
+					ext_click_area="8"
+					style_bg_color="0x375469"
+					style_bg_opa="100%"
+					style_radius="100"
+					style_border_width="0"
+					style_pad_all="0"
+					style_shadow_width="0"
+					style_bg_color-checked="#color_cyan"
+					style_width-checked="16"
+				/>
+				<lv_tabview-tab_button
+					name="trip_dot_2"
+					index="2"
+					width="5"
+					height="5"
+					flex_grow="0"
+					ext_click_area="8"
+					style_bg_color="0x375469"
+					style_bg_opa="100%"
+					style_radius="100"
+					style_border_width="0"
+					style_pad_all="0"
+					style_shadow_width="0"
+					style_bg_color-checked="#color_cyan"
+					style_width-checked="16"
+				/>
+			</lv_tabview>
+		</lv_obj>
+	</view>
+</component>

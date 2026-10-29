@@ -1,5 +1,31 @@
 list(
   APPEND
   LV_EDITOR_PROJECT_SOURCES
+  ${CMAKE_CURRENT_LIST_DIR}/components/dashboard_view_gen.c
+  ${CMAKE_CURRENT_LIST_DIR}/components/diagnostics_view_gen.c
+  ${CMAKE_CURRENT_LIST_DIR}/components/settings_view_gen.c
+  ${CMAKE_CURRENT_LIST_DIR}/components/trip_view_gen.c
   ${CMAKE_CURRENT_LIST_DIR}/ebike_display_gen.c
-  ${CMAKE_CURRENT_LIST_DIR}/ebike_display.c)
+  ${CMAKE_CURRENT_LIST_DIR}/ebike_display.c
+  ${CMAKE_CURRENT_LIST_DIR}/fonts/ui_medium_data.c
+  ${CMAKE_CURRENT_LIST_DIR}/fonts/ui_small_data.c
+  ${CMAKE_CURRENT_LIST_DIR}/fonts/ui_speed_data.c
+  ${CMAKE_CURRENT_LIST_DIR}/fonts/ui_value_data.c
+  ${CMAKE_CURRENT_LIST_DIR}/images/ui_img_background_data.c
+  ${CMAKE_CURRENT_LIST_DIR}/images/ui_img_battery_data.c
+  ${CMAKE_CURRENT_LIST_DIR}/images/ui_img_brake_data.c
+  ${CMAKE_CURRENT_LIST_DIR}/images/ui_img_hazard_data.c
+  ${CMAKE_CURRENT_LIST_DIR}/images/ui_img_high_beam_data.c
+  ${CMAKE_CURRENT_LIST_DIR}/images/ui_img_left_data.c
+  ${CMAKE_CURRENT_LIST_DIR}/images/ui_img_low_beam_data.c
+  ${CMAKE_CURRENT_LIST_DIR}/images/ui_img_position_data.c
+  ${CMAKE_CURRENT_LIST_DIR}/images/ui_img_right_data.c
+  ${CMAKE_CURRENT_LIST_DIR}/images/ui_img_switch_knob_data.c
+  ${CMAKE_CURRENT_LIST_DIR}/images/ui_img_switch_track_data.c
+  ${CMAKE_CURRENT_LIST_DIR}/images/ui_img_thermometer_data.c
+  ${CMAKE_CURRENT_LIST_DIR}/images/ui_img_warning_data.c
+  ${CMAKE_CURRENT_LIST_DIR}/screens/app_gen.c
+  ${CMAKE_CURRENT_LIST_DIR}/screens/dashboard_gen.c
+  ${CMAKE_CURRENT_LIST_DIR}/screens/diagnostics_gen.c
+  ${CMAKE_CURRENT_LIST_DIR}/screens/settings_gen.c
+  ${CMAKE_CURRENT_LIST_DIR}/screens/trip_gen.c)

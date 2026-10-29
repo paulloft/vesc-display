@@ -5,7 +5,9 @@
 Иконки — отдельные сгенерированные растры с прозрачностью, см. `icons/README.md`.
 Показания и текст не запечены в картинку.
 Фон преобразуется в RGB565 480×320 скриптом `tools/convert_background.py`
-и входит в приложение как `src/dashboard_background.c`, поэтому SD для оформления не нужна.
+и обновляет `ebike_display/images/background.png`. После этого выполните
+**Export code only** в LVGL Pro: ресурс войдёт в прошивку без SD.
+`src/dashboard_background.c` оставлен для совместимости старого инструмента.
 
 Точный промпт генерации (built-in imagegen):
 

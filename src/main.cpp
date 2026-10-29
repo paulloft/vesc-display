@@ -9,6 +9,10 @@
 #include "BikeNetwork.h"
 #include <WiFi.h>
 
+// XML components and nested native tabviews deepen LVGL draw traversal.
+// Keep headroom beyond the default 8 KiB loop stack on ESP32-S3.
+SET_LOOP_TASK_STACK_SIZE(24 * 1024);
+
 namespace {
 bike::Config config;
 bike::State state;
@@ -47,6 +51,12 @@ void action(UiAction a) {
     else applyConfig(config.motionEnabled?"{\"motion_enabled\":false}":"{\"motion_enabled\":true}",result);
     notify(result);return;
   }
+  if(a==UiAction::ToggleSafe) {
+    state.setSafe(!state.safe);
+    if(vesc.ready()&&!vesc.request(state.mode,state.limit,config))setMode(bike::Mode::N);
+    storage.save(config,state,true);notify(state.safe?"Безопасный режим включён":"Безопасный режим выключен");
+    return;
+  }
   if(a==UiAction::Neutral)setMode(bike::Mode::N);
   if(a==UiAction::Drive)setMode(bike::Mode::Drive);
   if(a==UiAction::Sport)setMode(bike::Mode::Sport);
@@ -82,9 +92,7 @@ void keyEvent(bike::Event e,void*) {
   }
   if(e.key==Key::M&&e.gesture==Gesture::Click)setMode(static_cast<bike::Mode>((int(state.mode)+1)%3));
   if(e.key==Key::M&&e.gesture==Gesture::Double) {
-    state.setSafe(!state.safe);
-    if(vesc.ready()&&!vesc.request(state.mode,state.limit,config))setMode(bike::Mode::N);
-    storage.save(config,state,true);notify(state.safe?"Безопасный режим включён":"Безопасный режим выключен");
+    action(UiAction::ToggleSafe);
   }
   if(e.key==Key::Cruise&&e.gesture==Gesture::Down) {
     if(!vesc.cruise(!vesc.cruiseActive))notify(vesc.message);

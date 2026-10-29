@@ -1,0 +1,31 @@
+<component>
+    <view extends="lv_obj" width="480" height="320" scrollable="false" style_text_font="ui_small" style_bg_opa="100%" style_bg_color="#color_bg">
+        <style name="clear" />
+        <lv_label name="trip_title" text="ТЕКУЩАЯ ПОЕЗДКА" x="12" y="28" width="456" style_text_font="ui_medium" style_text_color="#color_text" clickable="false" />
+        <lv_obj name="stats_card_0" x="12" y="59" width="108" height="62" scrollable="false">
+            <style name="card" />
+            <lv_label name="stats_caption_0" text="МАКС. КМ/Ч" x="0" y="5" width="106" style_text_font="ui_small" style_text_color="#color_text" clickable="false" style_text_align="center" />
+            <lv_label name="stats_value_0" text="46" x="0" y="26" width="106" style_text_font="ui_medium" style_text_color="#color_text" clickable="false" style_text_align="center" />
+        </lv_obj>
+        <lv_obj name="stats_card_1" x="128" y="59" width="108" height="62" scrollable="false">
+            <style name="card" />
+            <lv_label name="stats_caption_1" text="ПРОБЕГ, КМ" x="0" y="5" width="106" style_text_font="ui_small" style_text_color="#color_text" clickable="false" style_text_align="center" />
+            <lv_label name="stats_value_1" text="24.8" x="0" y="26" width="106" style_text_font="ui_medium" style_text_color="#color_text" clickable="false" style_text_align="center" />
+        </lv_obj>
+        <lv_obj name="stats_card_2" x="244" y="59" width="108" height="62" scrollable="false">
+            <style name="card" />
+            <lv_label name="stats_caption_2" text="РАСХОД, Втч" x="0" y="5" width="106" style_text_font="ui_small" style_text_color="#color_text" clickable="false" style_text_align="center" />
+            <lv_label name="stats_value_2" text="132.4" x="0" y="26" width="106" style_text_font="ui_medium" style_text_color="#color_text" clickable="false" style_text_align="center" />
+        </lv_obj>
+        <lv_obj name="stats_card_3" x="360" y="59" width="108" height="62" scrollable="false">
+            <style name="card" />
+            <lv_label name="stats_caption_3" text="ЧАС : МИН" x="0" y="5" width="106" style_text_font="ui_small" style_text_color="#color_text" clickable="false" style_text_align="center" />
+            <lv_label name="stats_value_3" text="01:23" x="0" y="26" width="106" style_text_font="ui_medium" style_text_color="#color_text" clickable="false" style_text_align="center" />
+        </lv_obj>
+        <lv_label name="chart_caption" text="СКОРОСТЬ · ПОСЛЕДНЯЯ МИНУТА" x="14" y="136" width="450" style_text_font="ui_small" style_text_color="#color_muted" clickable="false" />
+        <lv_chart name="speed_chart" x="12" y="162" width="456" height="141" type="line" point_count="60" hor_div_line_count="5" ver_div_line_count="6" style_bg_color="0x071622" style_bg_opa="100%" style_border_color="0x294e63" style_border_width="1" style_radius="10" style_line_color="0x294456" style_line_opa="70%" style_pad_all="10" style_width-indicator="0" style_height-indicator="0" style_line_width-items="2">
+            <lv_chart-axis axis="primary_y" min_value="0" max_value="100" />
+            <lv_chart-series color="#color_cyan" axis="primary_y" />
+        </lv_chart>
+    </view>
+</component>

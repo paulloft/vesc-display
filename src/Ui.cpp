@@ -1,6 +1,7 @@
 #include "Ui.h"
 #include "Board.h"
-#include "IconAssets.h"
+#include "ebike_display.h"
+#include <src/misc/lv_event_private.h>
 #include "FrameBuffer.h"
 #include <Arduino_GFX_Library.h>
 #include <Wire.h>
@@ -8,11 +9,6 @@
 #include <stdarg.h>
 #include <string.h>
 
-LV_FONT_DECLARE(font_ru_14);
-LV_FONT_DECLARE(font_ru_20);
-LV_FONT_DECLARE(font_speed_72);
-LV_FONT_DECLARE(font_value_32);
-LV_IMAGE_DECLARE(dashboard_background);
 namespace {
 Arduino_ESP32QSPI qspi(45,47,21,48,40,39);
 Arduino_AXS15231B lcd(&qspi,GFX_NOT_DEFINED,0,false,320,480);
@@ -30,58 +26,35 @@ void checked(lv_obj_t* obj,bool value) {
   if(lv_obj_has_state(obj,LV_STATE_CHECKED)==value)return;
   if(value)lv_obj_add_state(obj,LV_STATE_CHECKED);else lv_obj_remove_state(obj,LV_STATE_CHECKED);
 }
-lv_obj_t* label(lv_obj_t* parent,const char* text,int x,int y,int w,const lv_font_t* font=&font_ru_14) {
-  auto o=lv_label_create(parent);setLabel(o,text);lv_obj_set_pos(o,x,y);lv_obj_set_width(o,w);
-  lv_obj_set_style_text_font(o,font,0);lv_obj_set_style_text_color(o,lv_color_hex(0xe9f4ff),0);
-  lv_obj_set_clickable(o,false);return o;
+lv_obj_t* find(lv_obj_t* root,const char* name) {return lv_obj_find_by_name(root,name);}
+void removePreviewActions(lv_obj_t* object,lv_event_code_t code) {
+  for(int i=int(lv_obj_get_event_count(object))-1;i>=0;i--) {
+    auto event=lv_obj_get_event_dsc(object,i);
+    if((event->filter & ~LV_EVENT_PREPROCESS)==uint32_t(code))lv_obj_remove_event(object,i);
+  }
 }
-lv_obj_t* centered(lv_obj_t* p,const char* text,int y,int w,const lv_font_t* font=&font_ru_14) {
-  auto o=label(p,text,0,y,w,font);lv_obj_set_style_text_align(o,LV_TEXT_ALIGN_CENTER,0);return o;
-}
-lv_obj_t* panel(lv_obj_t* parent,int x,int y,int w,int h) {
-  auto o=lv_obj_create(parent);lv_obj_set_pos(o,x,y);lv_obj_set_size(o,w,h);
-  lv_obj_set_style_bg_color(o,lv_color_hex(0x06121e),0);lv_obj_set_style_bg_opa(o,235,0);
-  lv_obj_set_style_border_color(o,lv_color_hex(0x315870),0);lv_obj_set_style_border_width(o,1,0);
-  lv_obj_set_style_radius(o,12,0);lv_obj_set_style_pad_all(o,0,0);
-  lv_obj_set_scrollable(o,false);return o;
-}
-lv_obj_t* button(lv_obj_t* parent,const char* text,int x,int y,int w,int h,lv_event_cb_t cb,intptr_t id) {
-  auto o=lv_button_create(parent);lv_obj_set_pos(o,x,y);lv_obj_set_size(o,w,h);lv_obj_set_style_pad_all(o,0,0);
-  lv_obj_set_style_bg_color(o,lv_color_hex(0x112b3d),0);lv_obj_set_style_bg_grad_color(o,lv_color_hex(0x050e18),0);
-  lv_obj_set_style_bg_grad_dir(o,LV_GRAD_DIR_VER,0);lv_obj_set_style_bg_opa(o,LV_OPA_COVER,0);
-  lv_obj_set_style_border_color(o,lv_color_hex(0x37647e),0);lv_obj_set_style_border_width(o,1,0);
-  lv_obj_set_style_radius(o,10,0);lv_obj_set_style_shadow_width(o,0,0);
-  lv_obj_set_style_bg_color(o,lv_color_hex(0x084b69),LV_STATE_CHECKED);
-  lv_obj_set_style_border_color(o,lv_color_hex(cyan),LV_STATE_CHECKED);lv_obj_set_style_border_width(o,2,LV_STATE_CHECKED);
-  lv_obj_set_style_bg_color(o,lv_color_hex(0x126480),LV_STATE_PRESSED);
-  auto l=label(o,text,0,0,w);lv_obj_set_width(l,LV_SIZE_CONTENT);lv_obj_center(l);
-  lv_obj_add_event_cb(o,cb,LV_EVENT_CLICKED,reinterpret_cast<void*>(id));return o;
-}
-lv_obj_t* rasterIcon(lv_obj_t* p,const lv_image_dsc_t* image,int cx,int cy) {
-  auto o=lv_image_create(p);lv_image_set_src(o,image);
-  lv_obj_set_pos(o,cx-image->header.w/2,cy-image->header.h/2);
-  lv_obj_set_style_image_recolor_opa(o,LV_OPA_COVER,0);lv_obj_set_style_image_recolor(o,lv_color_white(),0);
-  lv_obj_set_clickable(o,false);return o;
+float gaugeAngle(lv_obj_t* arc,float speed) {
+  float start=lv_arc_get_bg_angle_start(arc),span=lv_arc_get_bg_angle_end(arc)-start;
+  if(span<0)span+=360;
+  int low=lv_arc_get_min_value(arc),high=lv_arc_get_max_value(arc);
+  float fraction=std::max(0.0f,std::min(1.0f,(speed-low)/std::max(1,high-low)));
+  return (lv_arc_get_rotation(arc)+start+fraction*span)*PI/180;
 }
 void line(lv_layer_t* layer,int x,int y,int x2,int y2,uint32_t color,int width=1) {
   lv_draw_line_dsc_t d;lv_draw_line_dsc_init(&d);d.color=lv_color_hex(color);d.width=width;d.round_start=d.round_end=1;
   d.p1.x=x;d.p1.y=y;d.p2.x=x2;d.p2.y=y2;lv_draw_line(layer,&d);
 }
-lv_obj_t* toggle(lv_obj_t* parent,int y,lv_event_cb_t cb,intptr_t id) {
-  auto o=lv_switch_create(parent);lv_obj_set_pos(o,390,y);lv_obj_set_size(o,66,30);
-  lv_obj_set_style_bg_color(o,lv_color_hex(0x243c4d),LV_PART_MAIN);
-  lv_obj_set_style_bg_color(o,lv_color_hex(cyan),static_cast<lv_style_selector_t>(LV_PART_INDICATOR)|LV_STATE_CHECKED);
-  lv_obj_add_event_cb(o,cb,LV_EVENT_VALUE_CHANGED,reinterpret_cast<void*>(id));return o;
-}
 }
 void Ui::drawGaugeOverlay(lv_event_t* event) {
   auto& u=*activeUi;auto layer=lv_event_get_layer(event);lv_area_t a;lv_obj_get_coords(static_cast<lv_obj_t*>(lv_event_get_target(event)),&a);
-  const int cx=a.x1+110,cy=a.y1+110;
   if(u.iconFresh_) {
-    float angle=(150+std::min(100.0f,u.speedValue_)*2.4f)*PI/180;
-    line(layer,cx+int(cosf(angle)*89),cy+int(sinf(angle)*89),cx+int(cosf(angle)*107),cy+int(sinf(angle)*107),0xffffff,3);
+    int w=lv_area_get_width(&a),h=lv_area_get_height(&a),radius=std::min(w,h)/2;
+    int cx=a.x1+w/2,cy=a.y1+h/2;float angle=gaugeAngle(u.arc_,u.speedValue_);
+    line(layer,cx+int(lroundf(cosf(angle)*radius*.80f)),cy+int(lroundf(sinf(angle)*radius*.80f)),
+      cx+int(lroundf(cosf(angle)*radius*.97f)),cy+int(lroundf(sinf(angle)*radius*.97f)),0xffffff,3);
   }
 }
+
 void Ui::flush(lv_display_t* display,const lv_area_t* a,uint8_t* pixels) {
   copyLandscapeToPortrait(canvas.getFramebuffer(),reinterpret_cast<uint16_t*>(pixels),a->x1,a->y1,a->x2-a->x1+1,a->y2-a->y1+1,activeUi->config_->screenFlipped);
   activeUi->metrics_.pixels+=(a->x2-a->x1+1)*(a->y2-a->y1+1);
@@ -110,7 +83,7 @@ void Ui::swipe(lv_event_t*) {
 void Ui::switchChanged(lv_event_t* e) {
   auto& u=*activeUi;if(u.refreshing_)return;int id=reinterpret_cast<intptr_t>(lv_event_get_user_data(e));
   if(id==0) {u.config_->screenFlipped=lv_obj_has_state(u.flipSwitch_,LV_STATE_CHECKED);lv_obj_invalidate(lv_screen_active());}
-  else if(u.sink_)u.sink_(id==1?UiAction::ToggleControl:UiAction::ToggleCruise);
+  else if(u.sink_)u.sink_(id==1?UiAction::ToggleControl:id==2?UiAction::ToggleCruise:UiAction::ToggleSafe);
   u.refreshSettings(); // Restore switch if the main handler rejected a moving change.
 }
 void Ui::adjustment(lv_event_t* e) {
@@ -129,41 +102,36 @@ void Ui::refreshSettings() {
   }
   refreshing_=false;
 }
-lv_obj_t* Ui::carousel(lv_obj_t* parent,int x,int y,int w,int h,uint8_t group,lv_obj_t** tiles) {
-  auto card=panel(parent,x,y,w,h);auto view=lv_tileview_create(card);lv_obj_set_pos(view,1,1);lv_obj_set_size(view,w-2,h-17);
-  lv_obj_set_style_bg_opa(view,LV_OPA_TRANSP,0);lv_obj_set_style_pad_all(view,0,0);lv_obj_set_style_border_width(view,0,0);
-  lv_obj_set_scrollbar_mode(view,LV_SCROLLBAR_MODE_OFF);lv_obj_set_style_anim_duration(view,180,0);
-  lv_obj_set_gesture_bubble(view,false);lv_obj_set_scroll_chain_hor(view,false);
-  for(int i=0;i<3;i++) {
-    tiles[i]=lv_tileview_add_tile(view,i,0,LV_DIR_HOR);lv_obj_set_style_pad_all(tiles[i],0,0);
-    lv_obj_set_gesture_bubble(tiles[i],false);lv_obj_set_scrollable(tiles[i],false);
-    auto hit=lv_obj_create(card);lv_obj_remove_style_all(hit);lv_obj_set_size(hit,24,16);lv_obj_set_pos(hit,w/2-36+i*24,h-17);
-    lv_obj_set_clickable(hit,true);lv_obj_set_scrollable(hit,false);lv_obj_set_gesture_bubble(hit,false);
-    lv_obj_add_event_cb(hit,dotClicked,LV_EVENT_CLICKED,reinterpret_cast<void*>(group*3+i));
-    auto dot=lv_obj_create(hit);lv_obj_remove_style_all(dot);lv_obj_set_size(dot,5,5);lv_obj_center(dot);
-    lv_obj_set_style_radius(dot,LV_RADIUS_CIRCLE,0);lv_obj_set_style_bg_opa(dot,LV_OPA_COVER,0);lv_obj_set_style_bg_color(dot,lv_color_hex(0x375469),0);
-    (group?batteryDots_:tripDots_)[i]=dot;
-  }
-  lv_obj_add_event_cb(view,carouselChanged,LV_EVENT_VALUE_CHANGED,reinterpret_cast<void*>(group));
-  return view;
-}
 void Ui::setCarousel(uint8_t group,uint8_t index,bool animate,bool emit) {
-  index%=3;auto view=group?batteryTiles_:tripTiles_;auto dots=group?batteryDots_:tripDots_;
+  index%=3;auto view=group?batteryTiles_:tripTiles_;
   if(group)batteryPage_=index;else meterPage_=index;
-  lv_tileview_set_tile_by_index(view,index,0,animate?LV_ANIM_ON:LV_ANIM_OFF);
-  for(int i=0;i<3;i++) {
-    int width=i==index?16:5;if(lv_obj_get_width(dots[i])!=width){lv_obj_set_width(dots[i],width);lv_obj_center(dots[i]);}
-    auto color=lv_color_hex(i==index?cyan:0x375469);
-    if(!lv_color_eq(lv_obj_get_style_bg_color(dots[i],LV_PART_MAIN),color))lv_obj_set_style_bg_color(dots[i],color,0);
-  }
+  lv_tabview_set_active(view,index,animate?LV_ANIM_ON:LV_ANIM_OFF);
+  // LVGL can keep the previous dot geometry after changing CHECKED during
+  // startup. Refresh the state-dependent width before the next layout pass.
+  for(uint32_t i=0;i<lv_tabview_get_tab_count(view);i++)
+    lv_obj_refresh_style(lv_tabview_get_tab_button(view,i),LV_PART_MAIN,LV_STYLE_WIDTH);
   if(emit&&!group&&sink_)sink_(static_cast<UiAction>(int(UiAction::MeterTrip)+index));
 }
 void Ui::carouselChanged(lv_event_t* e) {
-  auto& u=*activeUi;auto view=static_cast<lv_obj_t*>(lv_event_get_target(e));int group=reinterpret_cast<intptr_t>(lv_event_get_user_data(e));
-  auto tile=lv_tileview_get_tile_active(view);if(!tile)return;int index=lv_obj_get_index(tile);
+  auto& u=*activeUi;auto view=static_cast<lv_obj_t*>(lv_event_get_target(e));
+  if(view!=lv_event_get_current_target(e))return;
+  int group=reinterpret_cast<intptr_t>(lv_event_get_user_data(e));int index=lv_tabview_get_tab_active(view);
   if(index!=(group?u.batteryPage_:u.meterPage_))u.setCarousel(group,index,false,true);
 }
-void Ui::dotClicked(lv_event_t* e) {int code=reinterpret_cast<intptr_t>(lv_event_get_user_data(e));activeUi->setCarousel(code/3,code%3,true,true);}
+void Ui::carouselSwipe(lv_event_t* e) {
+  auto input=lv_indev_active();if(!input)return;
+  auto direction=lv_indev_get_gesture_dir(input);
+  if(direction!=LV_DIR_LEFT&&direction!=LV_DIR_RIGHT)return;
+  auto& u=*activeUi;int group=reinterpret_cast<intptr_t>(lv_event_get_user_data(e));
+  auto view=group?u.batteryTiles_:u.tripTiles_;
+  int count=lv_tabview_get_tab_count(view),index=lv_tabview_get_tab_active(view);
+  if(count<2)return;
+  int next=(index+(direction==LV_DIR_LEFT?1:count-1))%count;
+  bool wraps=(index==count-1&&next==0)||(index==0&&next==count-1);
+  lv_event_stop_bubbling(e);lv_indev_wait_release(input);
+  // At the boundary jump directly, rather than animate backwards across all tabs.
+  u.setCarousel(group,next,!wraps,true);
+}
 bool Ui::begin(bike::Config& config,UiSink sink) {
   activeUi=this;config_=&config;sink_=sink;
   if(!psramFound())return false;
@@ -176,117 +144,99 @@ bool Ui::begin(bike::Config& config,UiSink sink) {
   auto display=lv_display_create(480,320);lv_display_set_color_format(display,LV_COLOR_FORMAT_RGB565);
   lv_display_set_buffers(display,buf,nullptr,480*48*2,LV_DISPLAY_RENDER_MODE_PARTIAL);lv_display_set_flush_cb(display,flush);
   auto input=lv_indev_create();lv_indev_set_type(input,LV_INDEV_TYPE_POINTER);lv_indev_set_read_cb(input,touch);
-  auto root=lv_screen_active();lv_obj_set_style_bg_color(root,lv_color_hex(0x040b12),0);lv_obj_set_style_text_font(root,&font_ru_14,0);
-  lv_obj_set_scrollable(root,false);lv_obj_add_event_cb(root,swipe,LV_EVENT_GESTURE,nullptr);
-  auto background=lv_image_create(root);lv_image_set_src(background,&dashboard_background);lv_obj_set_pos(background,0,0);
-  status_=label(root,"Загрузка…",8,3,464);lv_label_set_long_mode(status_,LV_LABEL_LONG_MODE_DOTS);lv_obj_set_height(status_,18);
-  lv_obj_set_style_text_color(status_,lv_color_hex(muted),0);
-  for(auto& page:pages_){page=panel(root,0,25,480,295);lv_obj_set_style_bg_opa(page,LV_OPA_TRANSP,0);lv_obj_set_style_border_width(page,0,0);}
-  auto main=pages_[0];lv_obj_set_y(main,0);lv_obj_set_height(main,320);lv_obj_t* tiles[3];
-  batteryTiles_=carousel(main,8,35,112,70,1,tiles);
-  label(tiles[0],"ЗАРЯД",40,4,69);batteryValues_[0]=label(tiles[0],"—",40,20,69,&font_value_32);
-  batteryBar_=lv_bar_create(tiles[0]);lv_obj_set_pos(batteryBar_,15,17);lv_obj_set_size(batteryBar_,14,33);
-  lv_obj_set_style_bg_color(batteryBar_,lv_color_hex(0x152a38),0);lv_obj_set_style_bg_color(batteryBar_,lv_color_hex(green),LV_PART_INDICATOR);
-  rasterIcons_[Battery]=rasterIcon(tiles[0],&icon_battery,22,29);
-  centered(tiles[1],"НАПРЯЖЕНИЕ",3,110);batteryValues_[1]=centered(tiles[1],"—",21,110,&font_value_32);
-  centered(tiles[2],"МОЩНОСТЬ, Вт",3,110);batteryValues_[2]=centered(tiles[2],"—",21,110,&font_value_32);
-  setCarousel(1,0,false,false);
-  auto b=panel(main,8,113,112,100);label(b,"МОТОР",37,4,75);motorTemp_=label(b,"—",37,20,75,&font_ru_20);
-  label(b,"КОНТР.",37,53,75);controllerTemp_=label(b,"—",37,69,75,&font_ru_20);
-  auto divider=panel(b,9,49,94,1);lv_obj_set_style_bg_color(divider,lv_color_hex(0x284559),0);lv_obj_set_style_border_width(divider,0,0);
-  rasterIcons_[MotorTemperature]=rasterIcon(main,&icon_thermometer,28,137);rasterIcons_[ControllerTemperature]=rasterIcon(main,&icon_thermometer,28,186);
-  arc_=lv_arc_create(main);lv_obj_set_pos(arc_,125,35);lv_obj_set_size(arc_,221,221);
-  lv_arc_set_rotation(arc_,150);lv_arc_set_bg_angles(arc_,0,240);lv_arc_set_range(arc_,0,100);lv_arc_set_value(arc_,0);
-  lv_obj_set_style_arc_color(arc_,lv_color_hex(0x233f51),LV_PART_MAIN);lv_obj_set_style_arc_width(arc_,8,LV_PART_MAIN);
-  lv_obj_set_style_arc_color(arc_,lv_color_hex(red),LV_PART_INDICATOR);lv_obj_set_style_arc_width(arc_,8,LV_PART_INDICATOR);
-  lv_obj_set_style_bg_opa(arc_,LV_OPA_TRANSP,LV_PART_KNOB);lv_obj_set_style_pad_all(arc_,4,0);lv_obj_set_clickable(arc_,false);
-  // Use the native radial scale so every tick shares the arc's center/angles.
-  auto scale=lv_scale_create(main);lv_obj_remove_style_all(scale);lv_obj_set_pos(scale,125,35);lv_obj_set_size(scale,221,221);
-  lv_obj_set_style_pad_all(scale,14,0);lv_obj_set_clickable(scale,false);lv_obj_set_scrollable(scale,false);
-  lv_scale_set_mode(scale,LV_SCALE_MODE_ROUND_INNER);lv_scale_set_range(scale,0,100);
-  lv_scale_set_angle_range(scale,240);lv_scale_set_rotation(scale,150);lv_scale_set_total_tick_count(scale,51);lv_scale_set_major_tick_every(scale,10);
-  lv_obj_set_style_arc_opa(scale,LV_OPA_TRANSP,LV_PART_MAIN);lv_obj_set_style_line_width(scale,0,LV_PART_MAIN);
-  lv_obj_set_style_length(scale,6,LV_PART_ITEMS);lv_obj_set_style_line_width(scale,1,LV_PART_ITEMS);
-  lv_obj_set_style_line_color(scale,lv_color_hex(0x91b1c6),LV_PART_ITEMS);lv_obj_set_style_line_opa(scale,130,LV_PART_ITEMS);
-  lv_obj_set_style_length(scale,13,LV_PART_INDICATOR);lv_obj_set_style_line_width(scale,2,LV_PART_INDICATOR);
-  lv_obj_set_style_line_color(scale,lv_color_hex(0xc5dfef),LV_PART_INDICATOR);lv_obj_set_style_text_color(scale,lv_color_hex(0xbcd8ea),LV_PART_INDICATOR);
-  lv_obj_set_style_text_font(scale,&font_ru_14,LV_PART_INDICATOR);
-  decorations_=lv_obj_create(main);lv_obj_remove_style_all(decorations_);lv_obj_set_pos(decorations_,125,35);lv_obj_set_size(decorations_,221,221);
-  lv_obj_set_clickable(decorations_,false);lv_obj_set_scrollable(decorations_,false);lv_obj_add_event_cb(decorations_,drawGaugeOverlay,LV_EVENT_DRAW_MAIN,nullptr);
-  speed_=centered(main,"--",91,186,&font_speed_72);lv_obj_set_x(speed_,143);
-  auto unit=centered(main,"КМ/Ч",165,120);lv_obj_set_x(unit,176);
-  auto badge=panel(main,184,202,104,29);lv_obj_set_style_border_color(badge,lv_color_hex(cyan),0);lv_obj_set_style_border_width(badge,2,0);
-  modeBadge_=label(badge,"N",0,0,LV_SIZE_CONTENT,&font_ru_20);lv_obj_center(modeBadge_);
-  tripTiles_=carousel(main,351,35,121,102,0,tiles);
-  const char* titles[]={"ПОЕЗДКА","ОБЩИЙ","ВРЕМЯ"};const char* units[]={"КМ","КМ","ЧАС : МИН"};
-  for(int i=0;i<3;i++){centered(tiles[i],titles[i],5,119);tripValues_[i]=centered(tiles[i],i==2?"00:00":"0.0",28,119,&font_value_32);centered(tiles[i],units[i],65,119);}
-  setCarousel(0,0,false,false);
-  hazardButton_=button(main,"",351,145,121,68,buttonEvent,int(UiAction::Hazard));rasterIcons_[Hazard]=rasterIcon(hazardButton_,&icon_hazard,60,34);
-  auto warning=button(main,"",364,0,40,27,navigation,2);lv_obj_set_style_bg_opa(warning,LV_OPA_TRANSP,0);lv_obj_set_style_border_width(warning,0,0);
-  auto footer=panel(main,4,250,472,70);lv_obj_set_style_radius(footer,10,0);
-  const char* modes[]={"N","Drive","Sport"};const int mx[]={8,66,144},mw[]={52,72,72};
-  for(int i=0;i<3;i++){modeButtons_[i]=button(main,modes[i],mx[i],254,mw[i],62,buttonEvent,i);lv_obj_set_style_text_font(lv_obj_get_child(modeButtons_[i],0),&font_ru_20,0);}
-  auto separator=panel(main,225,257,1,56);lv_obj_set_style_bg_color(separator,lv_color_hex(0x447b98),0);lv_obj_set_style_border_width(separator,0,0);
-  const char* limits[]={"25","50","70","MAX"};for(int i=0;i<4;i++) {
-    limitButtons_[i]=button(main,limits[i],235+i*60,254,55,62,buttonEvent,3+i);lv_obj_set_style_text_font(lv_obj_get_child(limitButtons_[i],0),&font_ru_20,0);
-    lv_obj_set_style_border_color(limitButtons_[i],lv_color_hex(red),LV_STATE_CHECKED);lv_obj_set_style_bg_color(limitButtons_[i],lv_color_hex(0x491b20),LV_STATE_CHECKED);
+  lv_indev_set_gesture_min_velocity(input,1);lv_indev_set_gesture_min_distance(input,16);
+  ebike_display_init("");
+  auto previous=lv_screen_active();auto root=app_create();lv_screen_load(root);lv_obj_delete(previous);
+  mainTabs_=find(root,"app_pages");status_=find(root,"status_line");
+  if(!mainTabs_||!status_)return false;
+  lv_obj_update_layout(root);statusMainY_=lv_obj_get_y(status_);
+  // ESP32 switches full pages immediately. Native tabviews remain swipeable
+  // in the desktop editor, while the MCU avoids animating a whole 480x320 frame.
+  lv_obj_set_scrollable(mainTabs_,false);
+  lv_obj_set_scrollable(lv_tabview_get_tab_bar(mainTabs_),false);
+  lv_obj_set_scrollable(lv_tabview_get_content(mainTabs_),false);
+  lv_obj_add_event_cb(root,swipe,LV_EVENT_GESTURE,nullptr);
+  for(int i=0;i<4;i++){char name[24];snprintf(name,sizeof(name),"app_page_%d",i);pages_[i]=find(root,name);if(!pages_[i])return false;}
+  speed_=find(root,"speed_value");arc_=find(root,"speed_arc");modeBadge_=find(root,"mode_badge");
+  diag_=find(root,"diagnostics_text");hazardButton_=find(root,"hazard");
+  batteryTiles_=find(root,"battery_pages");tripTiles_=find(root,"trip_pages");batteryBar_=find(root,"battery_fill");
+  motorTemp_=find(root,"motor_value");controllerTemp_=find(root,"controller_value");
+  flipSwitch_=find(root,"flip_switch");controlSwitch_=find(root,"control_switch");cruiseSwitch_=find(root,"cruise_switch");safeSwitch_=find(root,"safe_switch");
+  chart_=find(root,"speed_chart");
+  if(!speed_||!arc_||!modeBadge_||!diag_||!hazardButton_||!batteryTiles_||!tripTiles_||!batteryBar_||!motorTemp_||!controllerTemp_||!flipSwitch_||!controlSwitch_||!cruiseSwitch_||!safeSwitch_||!chart_)return false;
+  for(int i=0;i<3;i++) {
+    char name[32];snprintf(name,sizeof(name),"battery_value_%d",i);batteryValues_[i]=find(root,name);
+    snprintf(name,sizeof(name),"trip_value_%d",i);tripValues_[i]=find(root,name);
+    if(!batteryValues_[i]||!tripValues_[i])return false;
   }
-  rasterIcons_[Left]=rasterIcon(main,&icon_left,24,14);rasterIcons_[Position]=rasterIcon(main,&icon_position,96,14);
-  rasterIcons_[LowBeam]=rasterIcon(main,&icon_low_beam,168,14);rasterIcons_[HighBeam]=rasterIcon(main,&icon_high_beam,240,14);
-  rasterIcons_[Brake]=rasterIcon(main,&icon_brake,312,14);rasterIcons_[Warning]=rasterIcon(main,&icon_warning,384,14);rasterIcons_[Right]=rasterIcon(main,&icon_right,456,14);
-  auto settings=pages_[1];lv_obj_set_style_bg_opa(settings,LV_OPA_COVER,0);label(settings,"НАСТРОЙКИ",12,3,300,&font_ru_20);
-  auto list=panel(settings,4,32,472,211);lv_obj_set_scrollable(list,true);lv_obj_set_scroll_dir(list,LV_DIR_VER);
-  lv_obj_set_style_border_width(list,0,0);lv_obj_set_style_bg_opa(list,LV_OPA_TRANSP,0);
+  const char* modes[]={"select_N","select_Drive","select_Sport"};
+  const char* limits[]={"limit_25","limit_50","limit_70","limit_0"};
+  auto wireAction=[&](lv_obj_t* o,int id){removePreviewActions(o,LV_EVENT_CLICKED);lv_obj_add_event_cb(o,buttonEvent,LV_EVENT_CLICKED,reinterpret_cast<void*>(id));};
+  for(int i=0;i<3;i++){modeButtons_[i]=find(root,modes[i]);if(!modeButtons_[i])return false;wireAction(modeButtons_[i],i);}
+  for(int i=0;i<4;i++){limitButtons_[i]=find(root,limits[i]);if(!limitButtons_[i])return false;wireAction(limitButtons_[i],3+i);}
+  wireAction(hazardButton_,int(UiAction::Hazard));auto save=find(root,"save_settings");if(!save)return false;wireAction(save,int(UiAction::Save));
+  const char* roles[]={"status_left","status_right","status_position","status_low_beam","status_high_beam","hazard_icon","status_warning","battery_frame","motor_icon","controller_icon","status_brake"};
+  for(int i=0;i<11;i++){rasterIcons_[i]=find(root,roles[i]);if(!rasterIcons_[i])return false;}
+  removePreviewActions(rasterIcons_[Warning],LV_EVENT_CLICKED);
+  lv_obj_add_event_cb(rasterIcons_[Warning],navigation,LV_EVENT_CLICKED,reinterpret_cast<void*>(2));
   for(size_t i=0;i<timingSettingCount;i++) {
-    int y=i*54;label(list,timingSettings[i].label,12,y+16,210);settingValues_[i]=label(list,"",217,y+16,105);
-    lv_obj_set_style_text_color(settingValues_[i],lv_color_hex(cyan),0);lv_obj_set_style_text_align(settingValues_[i],LV_TEXT_ALIGN_RIGHT,0);
-    button(list,"-",339,y+8,52,32,adjustment,-int(i+1));button(list,"+",400,y+8,52,32,adjustment,int(i+1));
+    char name[32];snprintf(name,sizeof(name),"timing_value_%u",unsigned(i));settingValues_[i]=find(root,name);
+    for(int sign:{-1,1}) {
+      snprintf(name,sizeof(name),sign<0?"timing_minus_%u":"timing_plus_%u",unsigned(i));auto o=find(root,name);if(!o||!settingValues_[i])return false;
+      removePreviewActions(o,LV_EVENT_CLICKED);lv_obj_add_event_cb(o,adjustment,LV_EVENT_CLICKED,reinterpret_cast<void*>(sign*intptr_t(i+1)));
+    }
   }
-  int y=timingSettingCount*54;
-  label(list,"Перевернуть экран",12,y+5,335);flipSwitch_=toggle(list,y,switchChanged,0);
-  label(list,"Управление VESC",12,y+55,335);controlSwitch_=toggle(list,y+50,switchChanged,1);
-  label(list,"Круиз-контроль",12,y+105,335);cruiseSwitch_=toggle(list,y+100,switchChanged,2);
-  label(settings,"Изменения действуют сразу",12,263,300);button(settings,"Сохранить",335,253,133,38,buttonEvent,int(UiAction::Save));refreshSettings();
-  auto diagnostics=pages_[2];lv_obj_set_style_bg_opa(diagnostics,LV_OPA_COVER,0);lv_obj_set_scrollable(diagnostics,true);lv_obj_set_scroll_dir(diagnostics,LV_DIR_VER);
-  diag_=label(diagnostics,"",12,7,456);
-  auto stats=pages_[3];lv_obj_set_style_bg_opa(stats,LV_OPA_COVER,0);label(stats,"ТЕКУЩАЯ ПОЕЗДКА",12,3,456,&font_ru_20);
-  const char* captions[]={"МАКС. КМ/Ч","ПРОБЕГ, КМ","РАСХОД, Втч","ЧАС : МИН"};
-  for(int i=0;i<4;i++){auto card=panel(stats,12+i*116,34,108,62);centered(card,captions[i],5,106);statsValues_[i]=centered(card,"—",26,106,&font_ru_20);}
-  auto chartLabel=label(stats,"СКОРОСТЬ · ПОСЛЕДНЯЯ МИНУТА",14,111,450);lv_obj_set_style_text_color(chartLabel,lv_color_hex(muted),0);
-  chart_=lv_chart_create(stats);lv_obj_set_pos(chart_,12,137);lv_obj_set_size(chart_,456,141);
-  lv_obj_set_style_bg_color(chart_,lv_color_hex(0x071622),0);lv_obj_set_style_border_color(chart_,lv_color_hex(0x294e63),0);lv_obj_set_style_radius(chart_,10,0);
-  lv_obj_set_style_size(chart_,0,0,LV_PART_INDICATOR);lv_obj_set_style_line_width(chart_,2,LV_PART_ITEMS);
-  lv_obj_set_style_line_color(chart_,lv_color_hex(0x294456),LV_PART_MAIN);
-  lv_obj_set_style_line_opa(chart_,LV_OPA_70,LV_PART_MAIN);
-  lv_obj_set_style_pad_all(chart_,10,0);
-  lv_chart_set_type(chart_,LV_CHART_TYPE_LINE);lv_chart_set_point_count(chart_,60);lv_chart_set_axis_range(chart_,LV_CHART_AXIS_PRIMARY_Y,0,100);
-  lv_chart_set_div_line_count(chart_,5,6);speedSeries_=lv_chart_add_series(chart_,lv_color_hex(cyan),LV_CHART_AXIS_PRIMARY_Y);
+  lv_obj_t* switches[]={flipSwitch_,controlSwitch_,cruiseSwitch_,safeSwitch_};
+  for(int i=0;i<4;i++){removePreviewActions(switches[i],LV_EVENT_VALUE_CHANGED);lv_obj_add_event_cb(switches[i],switchChanged,LV_EVENT_VALUE_CHANGED,reinterpret_cast<void*>(i));}
+  for(int group=0;group<2;group++) {
+    auto view=group?batteryTiles_:tripTiles_;auto content=lv_tabview_get_content(view);
+    // The Tabview itself must not steal a swipe to scroll its own children.
+    lv_obj_set_scrollable(view,false);lv_obj_set_scrollable(lv_tabview_get_tab_bar(view),false);
+    // Tabview creates an internal content object which XML 9.5 cannot style.
+    // Its default white background must never show through at the ends.
+    lv_obj_set_style_bg_opa(content,LV_OPA_TRANSP,0);
+    lv_obj_set_scroll_elastic(content,false);lv_obj_set_scrollable(content,false);
+    lv_obj_set_scroll_chain_hor(content,false);lv_obj_set_style_anim_duration(content,180,0);
+    auto wireSwipe=[&](lv_obj_t* object){
+      lv_obj_set_gesture_bubble(object,false);
+      lv_obj_add_event_cb(object,carouselSwipe,LV_EVENT_GESTURE,reinterpret_cast<void*>(group));
+    };
+    wireSwipe(view);wireSwipe(content);
+    for(uint32_t i=0;i<lv_obj_get_child_count(content);i++) {
+      auto tab=lv_obj_get_child(content,i);lv_obj_set_scrollable(tab,false);wireSwipe(tab);
+    }
+    lv_obj_add_event_cb(view,carouselChanged,LV_EVENT_VALUE_CHANGED,reinterpret_cast<void*>(group));
+  }
+  for(int i=0;i<4;i++){char name[24];snprintf(name,sizeof(name),"stats_value_%d",i);statsValues_[i]=find(root,name);if(!statsValues_[i])return false;}
+  speedSeries_=lv_chart_get_series_next(chart_,nullptr);if(!speedSeries_)return false;
   lv_chart_set_all_values(chart_,speedSeries_,LV_CHART_POINT_NONE);
-  // Cache the native scale once; keep the live widget if allocation fails.
-  lv_obj_update_layout(root);
-  // The generic scale reserves a 100 px outer label margin. Crop it from
-  // the cached round-inner image so its origin stays at the dial's origin.
+  // Cache the scale exported from XML, keeping its actual position and size.
+  auto scale=find(root,"speed_ticks");if(!scale)return false;lv_obj_update_layout(root);
+  int x=lv_obj_get_x(scale),y=lv_obj_get_y(scale),w=lv_obj_get_width(scale),h=lv_obj_get_height(scale);auto parent=lv_obj_get_parent(scale);
+  decorations_=lv_obj_create(parent);lv_obj_remove_style_all(decorations_);lv_obj_set_pos(decorations_,x,y);lv_obj_set_size(decorations_,w,h);
+  lv_obj_set_clickable(decorations_,false);lv_obj_set_scrollable(decorations_,false);lv_obj_add_event_cb(decorations_,drawGaugeOverlay,LV_EVENT_DRAW_MAIN,nullptr);
   gaugeRaster_=lv_snapshot_take(scale,LV_COLOR_FORMAT_A8);
   if(gaugeRaster_) {
-    int margin=(int(gaugeRaster_->header.w)-221)/2;
-    auto cropped=lv_draw_buf_create(221,221,LV_COLOR_FORMAT_A8,LV_STRIDE_AUTO);
-    if(cropped) {
-      lv_area_t area{margin,margin,margin+220,margin+220};
-      lv_draw_buf_copy(cropped,nullptr,gaugeRaster_,&area);lv_draw_buf_destroy(gaugeRaster_);gaugeRaster_=cropped;
-      margin=0;
-    }
-    auto image=lv_image_create(main);lv_image_set_src(image,gaugeRaster_);lv_obj_set_pos(image,125-margin,35-margin);
-    lv_obj_set_style_image_recolor(image,lv_color_hex(0xbcd8ea),0);lv_obj_set_style_image_recolor_opa(image,LV_OPA_COVER,0);
+    int mx=(int(gaugeRaster_->header.w)-w)/2,my=(int(gaugeRaster_->header.h)-h)/2;
+    auto cropped=lv_draw_buf_create(w,h,LV_COLOR_FORMAT_A8,LV_STRIDE_AUTO);
+    if(cropped){lv_area_t area{mx,my,mx+w-1,my+h-1};lv_draw_buf_copy(cropped,nullptr,gaugeRaster_,&area);lv_draw_buf_destroy(gaugeRaster_);gaugeRaster_=cropped;mx=my=0;}
+    auto image=lv_image_create(parent);lv_obj_set_name(image,"cached_speed_ticks");lv_image_set_src(image,gaugeRaster_);lv_obj_set_pos(image,x-mx,y-my);
+    lv_obj_set_style_image_recolor(image,lv_obj_get_style_text_color(scale,LV_PART_INDICATOR),0);lv_obj_set_style_image_recolor_opa(image,LV_OPA_COVER,0);
     lv_obj_set_clickable(image,false);lv_obj_move_to_index(image,lv_obj_get_index(scale));lv_obj_delete(scale);
   }
-  show(0);digitalWrite(board::backlight,HIGH);return true;
+  show(0);
+  // Preview fixtures never reach the physical display, even during startup.
+  bike::State initial;bike::Telemetry absent;update(initial,absent,millis(),false,false,false,"",false,false);
+  notice("Загрузка…");digitalWrite(board::backlight,HIGH);return true;
 }
+
 void Ui::show(uint8_t index) {
-  page_=index%4;lv_obj_set_y(status_,page_==0?233:3);for(int i=0;i<4;i++){if(i==page_)lv_obj_set_hidden(pages_[i],false);else lv_obj_set_hidden(pages_[i],true);}refreshSettings();
+  page_=index%4;lv_obj_set_y(status_,page_==0?statusMainY_:3);
+  lv_tabview_set_active(mainTabs_,page_,LV_ANIM_OFF);refreshSettings();
 }
 void Ui::notice(const String& text){if(status_)setLabel(status_,text.c_str());}
 void Ui::benchmark(void(*report)(int,bool,uint32_t)) {
-  uint8_t previous=page_;auto background=lv_obj_get_child(lv_screen_active(),0);
+  uint8_t previous=page_;auto background=find(pages_[0],"background");
   for(int pass=0;pass<2;pass++) {
     lv_obj_set_hidden(background,pass!=0);
     for(int page=0;page<4;page++) {
@@ -306,11 +256,13 @@ void Ui::update(const bike::State& s,const bike::Telemetry& t,uint32_t now,bool 
     textf(motorTemp_,"%.0f°C",double(t.motor));textf(controllerTemp_,"%.0f°C",double(t.fet));
   } else {setLabel(speed_,"--");for(auto label:batteryValues_)setLabel(label,"—");setLabel(motorTemp_,"—");setLabel(controllerTemp_,"—");}
   int percent=fresh?int(lroundf(t.soc*100)):0;if(lv_bar_get_value(batteryBar_)!=percent)lv_bar_set_value(batteryBar_,percent,LV_ANIM_OFF);
-  int newArc=std::min(100,int(value));if(arcValue_!=newArc){arcValue_=newArc;lv_arc_set_value(arc_,newArc);}
+  int newArc=std::min(int(lv_arc_get_max_value(arc_)),int(value));if(arcValue_!=newArc){arcValue_=newArc;lv_arc_set_value(arc_,newArc);}
   if(iconFresh_!=fresh||int(speedValue_)!=int(value)) {
     lv_area_t a;lv_obj_get_coords(decorations_,&a);
-    auto invalidate=[&](float v){float angle=(150+std::min(100.0f,v)*2.4f)*PI/180;int x=a.x1+110,y=a.y1+110;
-      int x1=x+int(cosf(angle)*89),y1=y+int(sinf(angle)*89),x2=x+int(cosf(angle)*107),y2=y+int(sinf(angle)*107);
+    auto invalidate=[&](float v){float angle=gaugeAngle(arc_,v);int w=lv_area_get_width(&a),h=lv_area_get_height(&a),r=std::min(w,h)/2;
+      int x=a.x1+w/2,y=a.y1+h/2;
+      int x1=x+int(lroundf(cosf(angle)*r*.80f)),y1=y+int(lroundf(sinf(angle)*r*.80f));
+      int x2=x+int(lroundf(cosf(angle)*r*.97f)),y2=y+int(lroundf(sinf(angle)*r*.97f));
       lv_area_t part{std::min(x1,x2)-4,std::min(y1,y2)-4,std::max(x1,x2)+4,std::max(y1,y2)+4};lv_obj_invalidate_area(decorations_,&part);};
     if(iconFresh_)invalidate(speedValue_);
     if(fresh)invalidate(value);
@@ -327,6 +279,7 @@ void Ui::update(const bike::State& s,const bike::Telemetry& t,uint32_t now,bool 
   auto batteryColor=lv_color_hex(fresh&&percent<20?red:green);if(!lv_color_eq(lv_obj_get_style_bg_color(batteryBar_,LV_PART_INDICATOR),batteryColor))lv_obj_set_style_bg_color(batteryBar_,batteryColor,LV_PART_INDICATOR);
   textf(modeBadge_,"%s%s",s.cruise?"КРУИЗ":s.mode==bike::Mode::N?"N":s.mode==bike::Mode::Drive?"Drive":"Sport",confirmed||!config_->motionEnabled?"":applying?"…":" !");
   checked(hazardButton_,s.turn==bike::Turn::Hazard);for(int i=0;i<3;i++)checked(modeButtons_[i],i==int(s.mode));
+  checked(safeSwitch_,s.safe);
   const int limits[]={25,50,70,0};for(int i=0;i<4;i++) {
     bool hidden=s.safe&&i>=2;if(hidden!=lv_obj_is_hidden(limitButtons_[i])){if(hidden)lv_obj_set_hidden(limitButtons_[i],true);else lv_obj_set_hidden(limitButtons_[i],false);}
     checked(limitButtons_[i],s.limit==limits[i]);

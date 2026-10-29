@@ -45,6 +45,7 @@ for name,alpha in icons.items():
     at=((canvas.width-resized.width)//2,(canvas.height-resized.height)//2)
     centered.paste(resized,at);canvas.putalpha(centered)
     canvas.save(assets/(name+'.png'))
+    canvas.save(root/'ebike_display/images'/(name+'.png'))
     bounds=centered.point(lambda value:255 if value>=32 else 0).getbbox()
     assert bounds
     center=((bounds[0]+bounds[2]-1)/2,(bounds[1]+bounds[3]-1)/2)
@@ -70,3 +71,5 @@ for i,name in enumerate(roles):
     preview.paste(im,(i%3*120+(120-im.width)//2,i//3*56+(56-im.height)//2),im)
 preview.resize((preview.width*4,preview.height*4),Image.Resampling.NEAREST).save(assets/'preview.png')
 print(f'Prepared {len(roles)} raster icons; visible bounds centered to within half a pixel.')
+
+print("LVGL Pro images updated. Run Export code only before building.")

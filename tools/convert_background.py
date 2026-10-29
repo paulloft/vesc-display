@@ -4,6 +4,10 @@ from pathlib import Path
 from PIL import Image
 root = Path(__file__).resolve().parents[1]
 image = Image.open(root/'assets/dashboard-background.png').convert('RGB').resize((480,320), Image.Resampling.LANCZOS)
+# These PNGs are the LVGL Pro source of truth; export code after conversion.
+image.save(root/'ebike_display/images/background.png')
+from shutil import copyfile
+copyfile(root/'assets/dashboard-background.png', root/'ebike_display/images/background-source.png')
 data = bytearray()
 for r,g,b in image.get_flattened_data():
     value = ((r>>3)<<11)|((g>>2)<<5)|(b>>3)
@@ -16,3 +20,5 @@ source += '''const lv_image_dsc_t dashboard_background = {
 };
 '''
 (root/'src/dashboard_background.c').write_text(source)
+
+print("Background updated in ebike_display/images. Run Export code only in LVGL Pro before building.")

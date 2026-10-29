@@ -1,0 +1,6 @@
+<screen>
+    <view width="480" height="320" scrollable="false" style_pad_all="0" style_border_width="0" style_bg_color="#color_bg">
+        <diagnostics_view name="diagnostics_view" />
+        <lv_label name="standalone_status" text="ПРЕДПРОСМОТР · тестовые показания" x="8" y="3" width="464" style_text_font="ui_small" style_text_color="#color_muted" clickable="false" />
+    </view>
+</screen>
