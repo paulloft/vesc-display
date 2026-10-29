@@ -14,6 +14,9 @@ list(
   ${CMAKE_CURRENT_LIST_DIR}/images/ui_img_background_data.c
   ${CMAKE_CURRENT_LIST_DIR}/images/ui_img_battery_data.c
   ${CMAKE_CURRENT_LIST_DIR}/images/ui_img_brake_data.c
+  ${CMAKE_CURRENT_LIST_DIR}/images/ui_img_gauge_active_data.c
+  ${CMAKE_CURRENT_LIST_DIR}/images/ui_img_gauge_bezel_data.c
+  ${CMAKE_CURRENT_LIST_DIR}/images/ui_img_gauge_idle_data.c
   ${CMAKE_CURRENT_LIST_DIR}/images/ui_img_hazard_data.c
   ${CMAKE_CURRENT_LIST_DIR}/images/ui_img_high_beam_data.c
   ${CMAKE_CURRENT_LIST_DIR}/images/ui_img_left_data.c

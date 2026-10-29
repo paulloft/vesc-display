@@ -137,6 +137,7 @@
 				style_image_recolor_opa="100%"
 			/>
 		</lv_obj>
+        <lv_image name="speed_bezel" src="ui_img_gauge_bezel" x="125" y="35" clickable="false" />
 		<lv_arc
 			name="speed_arc"
 			x="125"
@@ -150,9 +151,10 @@
 			max_value="100"
 			bind_value="ui_speed_value"
 			clickable="false"
-			style_pad_all="4"
+			style_pad_all="6"
 			style_arc_color="0x233f51"
-			style_arc_width="8"
+			style_arc_width="13"
+            style_arc_image_src="ui_img_gauge_idle"
 		>
 			<style name="arc_indicator" selector="indicator" />
 			<style name="arc_knob" selector="knob" />
@@ -170,15 +172,30 @@
 			max_value="100"
 			angle_range="240"
 			rotation="150"
-			label_show="true"
-			style_pad_all="14"
+			label_show="false"
+			style_pad_all="6"
 			style_arc_opa="0%"
 			style_line_width="0"
 			clickable="false"
 		>
 			<style name="minor_ticks" selector="items" />
 			<style name="major_ticks" selector="indicator" />
-		</lv_scale>
+		    <lv_scale name="speed_inner_ticks" align="center" width="193" height="193"
+                mode="round_inner" total_tick_count="51" major_tick_every="10"
+                min_value="0" max_value="100" angle_range="240" rotation="150"
+                label_show="true" style_pad_all="6" style_arc_opa="0%"
+                style_line_width="0" clickable="false">
+                <style name="inner_minor_ticks" selector="items" />
+                <style name="inner_major_ticks" selector="indicator" />
+            </lv_scale>
+            <lv_scale name="speed_half_ticks" align="center" width="221" height="221"
+                mode="round_inner" total_tick_count="5" major_tick_every="1"
+                min_value="10" max_value="90" angle_range="192" rotation="174"
+                label_show="false" style_pad_all="6" style_arc_opa="0%"
+                style_line_width="0" clickable="false">
+                <style name="half_major_ticks" selector="indicator" />
+            </lv_scale>
+        </lv_scale>
 		<lv_label
 			name="speed_value"
 			text="42"

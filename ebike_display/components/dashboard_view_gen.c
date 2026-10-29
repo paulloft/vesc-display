@@ -187,6 +187,13 @@ lv_obj_t * dashboard_view_create(lv_obj_t * parent)
         lv_obj_set_style_image_recolor(controller_icon, lv_color_hex(0xff9c60), 0);
         lv_obj_set_style_image_recolor_opa(controller_icon, (255 * 100 / 100), 0);
 
+        lv_obj_t * speed_bezel = lv_image_create(lv_obj_0);
+        lv_obj_set_name(speed_bezel, "speed_bezel");
+        lv_image_set_src(speed_bezel, ui_img_gauge_bezel);
+        lv_obj_set_x(speed_bezel, 125);
+        lv_obj_set_y(speed_bezel, 35);
+        lv_obj_set_flag(speed_bezel, LV_OBJ_FLAG_CLICKABLE, false);
+
         lv_obj_t * speed_arc = lv_arc_create(lv_obj_0);
         lv_obj_set_name(speed_arc, "speed_arc");
         lv_obj_set_x(speed_arc, 125);
@@ -200,9 +207,10 @@ lv_obj_t * dashboard_view_create(lv_obj_t * parent)
         lv_arc_set_max_value(speed_arc, 100);
         lv_arc_bind_value(speed_arc, &ui_speed_value);
         lv_obj_set_flag(speed_arc, LV_OBJ_FLAG_CLICKABLE, false);
-        lv_obj_set_style_pad_all(speed_arc, 4, 0);
+        lv_obj_set_style_pad_all(speed_arc, 6, 0);
         lv_obj_set_style_arc_color(speed_arc, lv_color_hex(0x233f51), 0);
-        lv_obj_set_style_arc_width(speed_arc, 8, 0);
+        lv_obj_set_style_arc_width(speed_arc, 13, 0);
+        lv_obj_set_style_arc_image_src(speed_arc, ui_img_gauge_idle, 0);
         lv_obj_add_style(speed_arc, &arc_indicator, LV_PART_INDICATOR);
         lv_obj_add_style(speed_arc, &arc_knob, LV_PART_KNOB);
 
@@ -219,13 +227,51 @@ lv_obj_t * dashboard_view_create(lv_obj_t * parent)
         lv_scale_set_max_value(speed_ticks, 100);
         lv_scale_set_angle_range(speed_ticks, 240);
         lv_scale_set_rotation(speed_ticks, 150);
-        lv_scale_set_label_show(speed_ticks, true);
-        lv_obj_set_style_pad_all(speed_ticks, 14, 0);
+        lv_scale_set_label_show(speed_ticks, false);
+        lv_obj_set_style_pad_all(speed_ticks, 6, 0);
         lv_obj_set_style_arc_opa(speed_ticks, (255 * 0 / 100), 0);
         lv_obj_set_style_line_width(speed_ticks, 0, 0);
         lv_obj_set_flag(speed_ticks, LV_OBJ_FLAG_CLICKABLE, false);
         lv_obj_add_style(speed_ticks, &minor_ticks, LV_PART_ITEMS);
         lv_obj_add_style(speed_ticks, &major_ticks, LV_PART_INDICATOR);
+        lv_obj_t * speed_inner_ticks = lv_scale_create(speed_ticks);
+        lv_obj_set_name(speed_inner_ticks, "speed_inner_ticks");
+        lv_obj_set_align(speed_inner_ticks, LV_ALIGN_CENTER);
+        lv_obj_set_width(speed_inner_ticks, 193);
+        lv_obj_set_height(speed_inner_ticks, 193);
+        lv_scale_set_mode(speed_inner_ticks, LV_SCALE_MODE_ROUND_INNER);
+        lv_scale_set_total_tick_count(speed_inner_ticks, 51);
+        lv_scale_set_major_tick_every(speed_inner_ticks, 10);
+        lv_scale_set_min_value(speed_inner_ticks, 0);
+        lv_scale_set_max_value(speed_inner_ticks, 100);
+        lv_scale_set_angle_range(speed_inner_ticks, 240);
+        lv_scale_set_rotation(speed_inner_ticks, 150);
+        lv_scale_set_label_show(speed_inner_ticks, true);
+        lv_obj_set_style_pad_all(speed_inner_ticks, 6, 0);
+        lv_obj_set_style_arc_opa(speed_inner_ticks, (255 * 0 / 100), 0);
+        lv_obj_set_style_line_width(speed_inner_ticks, 0, 0);
+        lv_obj_set_flag(speed_inner_ticks, LV_OBJ_FLAG_CLICKABLE, false);
+        lv_obj_add_style(speed_inner_ticks, &inner_minor_ticks, LV_PART_ITEMS);
+        lv_obj_add_style(speed_inner_ticks, &inner_major_ticks, LV_PART_INDICATOR);
+
+        lv_obj_t * speed_half_ticks = lv_scale_create(speed_ticks);
+        lv_obj_set_name(speed_half_ticks, "speed_half_ticks");
+        lv_obj_set_align(speed_half_ticks, LV_ALIGN_CENTER);
+        lv_obj_set_width(speed_half_ticks, 221);
+        lv_obj_set_height(speed_half_ticks, 221);
+        lv_scale_set_mode(speed_half_ticks, LV_SCALE_MODE_ROUND_INNER);
+        lv_scale_set_total_tick_count(speed_half_ticks, 5);
+        lv_scale_set_major_tick_every(speed_half_ticks, 1);
+        lv_scale_set_min_value(speed_half_ticks, 10);
+        lv_scale_set_max_value(speed_half_ticks, 90);
+        lv_scale_set_angle_range(speed_half_ticks, 192);
+        lv_scale_set_rotation(speed_half_ticks, 174);
+        lv_scale_set_label_show(speed_half_ticks, false);
+        lv_obj_set_style_pad_all(speed_half_ticks, 6, 0);
+        lv_obj_set_style_arc_opa(speed_half_ticks, (255 * 0 / 100), 0);
+        lv_obj_set_style_line_width(speed_half_ticks, 0, 0);
+        lv_obj_set_flag(speed_half_ticks, LV_OBJ_FLAG_CLICKABLE, false);
+        lv_obj_add_style(speed_half_ticks, &half_major_ticks, LV_PART_INDICATOR);
 
         lv_obj_t * speed_value = lv_label_create(lv_obj_0);
         lv_obj_set_name(speed_value, "speed_value");

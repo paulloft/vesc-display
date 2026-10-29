@@ -37,6 +37,9 @@
     <data name="ui_img_hazard" src_path="images/hazard.png" color_format="a8" />
     <data name="ui_img_battery" src_path="images/battery.png" color_format="a8" />
     <data name="ui_img_thermometer" src_path="images/thermometer.png" color_format="a8" />
+    <data name="ui_img_gauge_active" src_path="images/gauge_active.png" color_format="rgb565" />
+    <data name="ui_img_gauge_idle" src_path="images/gauge_idle.png" color_format="rgb565" />
+    <data name="ui_img_gauge_bezel" src_path="images/gauge_bezel.png" color_format="rgb565a8" />
     <data name="ui_img_switch_track" src_path="images/switch_track.png" color_format="a8" />
     <data name="ui_img_switch_knob" src_path="images/switch_knob.png" color_format="a8" />
   </images>
@@ -52,10 +55,13 @@
     <style name="selected" bg_color="0x084b69" border_color="#color_cyan" border_width="2" />
     <style name="limit_selected" bg_color="0x491b20" border_color="#color_red" border_width="2" />
     <style name="battery_fill_style" bg_color="0x31f29a" />
-    <style name="arc_indicator" arc_color="#color_red" arc_width="8" />
+    <style name="arc_indicator" arc_color="#color_red" arc_width="13" arc_image_src="ui_img_gauge_active" />
     <style name="arc_knob" bg_opa="0%" border_width="0" shadow_width="0" />
-    <style name="minor_ticks" length="6" line_width="1" line_color="0x91b1c6" line_opa="50%" />
-    <style name="major_ticks" length="13" line_width="2" line_color="0xc5dfef" text_font="ui_small" text_color="0xbcd8ea" />
+    <style name="minor_ticks" length="7" radial_offset="-3" line_width="1" line_color="0xe2eff8" line_opa="85%" />
+    <style name="major_ticks" length="20" line_width="2" line_color="0xffffff" text_font="ui_small" text_color="0xbcd8ea" />
+    <style name="half_major_ticks" length="13" line_width="2" line_color="0xffffff" />
+    <style name="inner_minor_ticks" length="5" line_width="1" line_color="0x6c91a8" line_opa="55%" />
+    <style name="inner_major_ticks" length="6" line_width="2" line_color="0xe9f4ff" text_font="ui_small" text_color="0xbcd8ea" />
     <style name="dot_selected_0" bg_color="#color_cyan" width="16" />
     <style name="dot_selected_1" bg_color="#color_cyan" width="16" />
     <style name="dot_selected_2" bg_color="#color_cyan" width="16" />

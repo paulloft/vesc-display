@@ -130,6 +130,15 @@ int main(int argc,char** argv){
   auto driver=lv_display_get_default();originalFlush=lv_display_get_flush_cb(driver);lv_display_set_flush_cb(driver,measureFlush);
   t.speedMs=43/3.6f;t.receivedMs=now;ui.update(state,t,now,true,true,false,"",true);now+=100;ui.tick();
   assert(renderedPixels>0&&renderedPixels<480*232);lv_display_set_flush_cb(driver,originalFlush);
+  // Check the gauge after partial redraws in either direction against
+  // a clean full refresh.
+  for(float kmh:{18.0f,68.0f,0.0f,43.0f}) {
+    t.speedMs=kmh/3.6f;t.receivedMs=now;
+    ui.update(state,t,now,true,true,false,"",true);now+=35;ui.tick();lv_refr_now(nullptr);
+    std::vector<uint16_t> partial(capturedFrame,capturedFrame+480*320);
+    lv_obj_invalidate(screen);lv_refr_now(nullptr);
+    assert(std::equal(partial.begin(),partial.end(),capturedFrame));
+  }
   swipeLeft(ui);assert(lv_tabview_get_tab_active(tabs)==1);
   save("build/ui-settings.ppm",ui);
   // Edit the shared config through +/- buttons and switches.

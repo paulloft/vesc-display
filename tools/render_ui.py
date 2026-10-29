@@ -5,6 +5,7 @@ from concurrent.futures import ThreadPoolExecutor
 import subprocess
 import os
 import re
+import hashlib
 from pro_font_metrics import write_value_metrics
 
 root = Path(__file__).resolve().parents[1]
@@ -22,7 +23,10 @@ sources = sorted((lvgl/'src').rglob('*.c')) + export_sources + [root/'src/UiAllo
 
 def compile_one(pair):
     i, source = pair
-    obj = dest / (str(i) + '.o')
+    # Resource exports may insert source files; index-based names can reuse
+    # a cached object belonging to a different image after that insertion.
+    key = hashlib.sha256(str(source).encode()).hexdigest()[:16]
+    obj = dest / (key + '.o')
     cpp = source.suffix == '.cpp'
     compiler = 'c++' if cpp else 'cc'
     # Recompile changed project files; the third-party library can stay cached.

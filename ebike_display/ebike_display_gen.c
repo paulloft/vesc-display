@@ -91,6 +91,12 @@ const void * ui_img_battery = NULL;
 extern const void * ui_img_battery_data;
 const void * ui_img_thermometer = NULL;
 extern const void * ui_img_thermometer_data;
+const void * ui_img_gauge_active = NULL;
+extern const void * ui_img_gauge_active_data;
+const void * ui_img_gauge_idle = NULL;
+extern const void * ui_img_gauge_idle_data;
+const void * ui_img_gauge_bezel = NULL;
+extern const void * ui_img_gauge_bezel_data;
 const void * ui_img_switch_track = NULL;
 extern const void * ui_img_switch_track_data;
 const void * ui_img_switch_knob = NULL;
@@ -109,6 +115,9 @@ lv_style_t arc_indicator;
 lv_style_t arc_knob;
 lv_style_t minor_ticks;
 lv_style_t major_ticks;
+lv_style_t half_major_ticks;
+lv_style_t inner_minor_ticks;
+lv_style_t inner_major_ticks;
 lv_style_t dot_selected_0;
 lv_style_t dot_selected_1;
 lv_style_t dot_selected_2;
@@ -247,6 +256,18 @@ void ebike_display_init_gen(const char * asset_path)
         if (!ui_img_thermometer) {
             ui_img_thermometer = &ui_img_thermometer_data;
         }
+        /* ui_img_gauge_active */
+        if (!ui_img_gauge_active) {
+            ui_img_gauge_active = &ui_img_gauge_active_data;
+        }
+        /* ui_img_gauge_idle */
+        if (!ui_img_gauge_idle) {
+            ui_img_gauge_idle = &ui_img_gauge_idle_data;
+        }
+        /* ui_img_gauge_bezel */
+        if (!ui_img_gauge_bezel) {
+            ui_img_gauge_bezel = &ui_img_gauge_bezel_data;
+        }
         /* ui_img_switch_track */
         if (!ui_img_switch_track) {
             ui_img_switch_track = &ui_img_switch_track_data;
@@ -275,6 +296,9 @@ void ebike_display_init_gen(const char * asset_path)
         lv_style_init(&arc_knob);
         lv_style_init(&minor_ticks);
         lv_style_init(&major_ticks);
+        lv_style_init(&half_major_ticks);
+        lv_style_init(&inner_minor_ticks);
+        lv_style_init(&inner_major_ticks);
         lv_style_init(&dot_selected_0);
         lv_style_init(&dot_selected_1);
         lv_style_init(&dot_selected_2);
@@ -307,19 +331,33 @@ void ebike_display_init_gen(const char * asset_path)
         lv_style_set_border_width(&limit_selected, 2);
         lv_style_set_bg_color(&battery_fill_style, lv_color_hex(0x31f29a));
         lv_style_set_arc_color(&arc_indicator, COLOR_RED);
-        lv_style_set_arc_width(&arc_indicator, 8);
+        lv_style_set_arc_width(&arc_indicator, 13);
+        lv_style_set_arc_image_src(&arc_indicator, ui_img_gauge_active);
         lv_style_set_bg_opa(&arc_knob, (255 * 0 / 100));
         lv_style_set_border_width(&arc_knob, 0);
         lv_style_set_shadow_width(&arc_knob, 0);
-        lv_style_set_length(&minor_ticks, 6);
+        lv_style_set_length(&minor_ticks, 7);
+        lv_style_set_radial_offset(&minor_ticks, -3);
         lv_style_set_line_width(&minor_ticks, 1);
-        lv_style_set_line_color(&minor_ticks, lv_color_hex(0x91b1c6));
-        lv_style_set_line_opa(&minor_ticks, (255 * 50 / 100));
-        lv_style_set_length(&major_ticks, 13);
+        lv_style_set_line_color(&minor_ticks, lv_color_hex(0xe2eff8));
+        lv_style_set_line_opa(&minor_ticks, (255 * 85 / 100));
+        lv_style_set_length(&major_ticks, 20);
         lv_style_set_line_width(&major_ticks, 2);
-        lv_style_set_line_color(&major_ticks, lv_color_hex(0xc5dfef));
+        lv_style_set_line_color(&major_ticks, lv_color_hex(0xffffff));
         lv_style_set_text_font(&major_ticks, ui_small);
         lv_style_set_text_color(&major_ticks, lv_color_hex(0xbcd8ea));
+        lv_style_set_length(&half_major_ticks, 13);
+        lv_style_set_line_width(&half_major_ticks, 2);
+        lv_style_set_line_color(&half_major_ticks, lv_color_hex(0xffffff));
+        lv_style_set_length(&inner_minor_ticks, 5);
+        lv_style_set_line_width(&inner_minor_ticks, 1);
+        lv_style_set_line_color(&inner_minor_ticks, lv_color_hex(0x6c91a8));
+        lv_style_set_line_opa(&inner_minor_ticks, (255 * 55 / 100));
+        lv_style_set_length(&inner_major_ticks, 6);
+        lv_style_set_line_width(&inner_major_ticks, 2);
+        lv_style_set_line_color(&inner_major_ticks, lv_color_hex(0xe9f4ff));
+        lv_style_set_text_font(&inner_major_ticks, ui_small);
+        lv_style_set_text_color(&inner_major_ticks, lv_color_hex(0xbcd8ea));
         lv_style_set_bg_color(&dot_selected_0, COLOR_CYAN);
         lv_style_set_width(&dot_selected_0, 16);
         lv_style_set_bg_color(&dot_selected_1, COLOR_CYAN);
@@ -450,6 +488,9 @@ void ebike_display_init_gen(const char * asset_path)
     lv_xml_register_image(NULL, "ui_img_hazard", ui_img_hazard);
     lv_xml_register_image(NULL, "ui_img_battery", ui_img_battery);
     lv_xml_register_image(NULL, "ui_img_thermometer", ui_img_thermometer);
+    lv_xml_register_image(NULL, "ui_img_gauge_active", ui_img_gauge_active);
+    lv_xml_register_image(NULL, "ui_img_gauge_idle", ui_img_gauge_idle);
+    lv_xml_register_image(NULL, "ui_img_gauge_bezel", ui_img_gauge_bezel);
     lv_xml_register_image(NULL, "ui_img_switch_track", ui_img_switch_track);
     lv_xml_register_image(NULL, "ui_img_switch_knob", ui_img_switch_knob);
 #endif
